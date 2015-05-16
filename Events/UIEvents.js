@@ -1,6 +1,6 @@
 module.exports = {
-    hostDiscovered: 'discovered',
-    hostDisappeared: 'disappeared',
+    deviceDiscovered: 'discovered',
+    deviceDisappeared: 'disappeared',
     createPerson: 'createPerson',
     getPersons: 'getPersons',
     persons: 'persons'

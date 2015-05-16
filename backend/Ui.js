@@ -152,8 +152,8 @@ var UICollection = function () {
             ui.addInvocation(invocation);
         });
 
-        ui.listenTo(UIEvents.hostDiscovered);
-        ui.listenTo(UIEvents.hostDisappeared);
+        ui.listenTo(UIEvents.deviceDiscovered);
+        ui.listenTo(UIEvents.deviceDisappeared);
         ui.listenTo(UIEvents.persons);
         ui.actOn(UIEvents.createPerson);
         ui.actOn(UIEvents.getPersons);

@@ -68,11 +68,11 @@ UI.on(UIEvents.createPerson, createPerson);
 UI.on(UIEvents.getPersons, getPersons);
 
 function onHostDiscovery(host) {
-	UI.emit(UIEvents.hostDiscovered, UI.all(), host);
+	UI.emit(UIEvents.deviceDiscovered, UI.all(), host);
 }
 
 function onHostDisappearance(host) {
-	UI.emit(UIEvents.hostDisappeared, UI.all(), host);
+	UI.emit(UIEvents.deviceDisappeared, UI.all(), host);
 }
 
 function onPersonDiscovery(host) {
