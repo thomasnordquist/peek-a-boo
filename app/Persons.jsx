@@ -5,7 +5,6 @@ var io = require('socket.io-client');
 var UIEvents = require('../Events/UIEvents');
 var config = require('../config');
 var moment = require('moment');
-require('moment-duration-format');
 
 
 var Persons = React.createClass({
@@ -58,23 +57,23 @@ var Persons = React.createClass({
         var renderPersons = function(key){
             var person = this.state.persons[key];
             return (
-                <tr key={person.email}>
+                <tr key={person.email} className='person'>
                     <td><img className='gravatar' src={ person.gravatar } /></td>
                     <td>{ person.name }</td>
-                    <td>{ person.lastSeen ? moment().diff(person.lastSeen).duration.format() : '' }</td>
-                    <td>{ isOffline(person) ? 'offline' : 'online' }</td>
+                    <td className='lastSeen'>{ person.lastSeen ? moment().to(person.lastSeen) : 'never' }</td>
+                    <td className='status'>{ isOffline(person) ? 'offline' : 'online' }</td>
                 </tr>
             );
         };
         return (
-            <Panel title='Hosts'>
-                <table className='table table-striped table-hover'>
+            <Panel title='Persons'>
+                <table className='table table-striped persons'>
                     <thead>
                         <tr>
                             <th></th>
                             <th>Name</th>
-                            <th>Last seen</th>
-                            <th>Status</th>
+                            <th className='lastSeen'>Last seen</th>
+                            <th className='status'>Status</th>
                         </tr>
                     </thead>
                     <tbody>
