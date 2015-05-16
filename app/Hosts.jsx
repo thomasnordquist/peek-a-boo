@@ -9,7 +9,7 @@ var HostList = React.createClass({
     getInitialState: function(){
         this.props.events.on(UIEvents.hostDiscovered, this.addHost);
         this.props.events.on(UIEvents.hostDisappeared, this.removeHost);
-        return {hosts: []};
+        return {hosts: this.hosts};
     },
     removeHost: function(host) {
         if(this.hosts[host.mac]) {
