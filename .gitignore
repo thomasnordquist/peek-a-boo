@@ -1,0 +1,6 @@
+.idea/
+node_modules/
+build/
+stores/*.db
+*.iml
+npm-debug.log
