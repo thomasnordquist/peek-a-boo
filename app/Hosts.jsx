@@ -40,12 +40,16 @@ var HostList = React.createClass({
         return (
             <Panel title='Hosts'>
                 <table className='table table-striped'>
-                    <tr>
-                        <th>IP</th>
-                        <th>MAC</th>
-                        <th>Host</th>
-                    </tr>
-                    { Object.keys(this.state.hosts).map(renderHosts.bind(this)) }
+                    <thead>
+                        <tr>
+                            <th>IP</th>
+                            <th>MAC</th>
+                            <th>Host</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        { Object.keys(this.state.hosts).map(renderHosts.bind(this)) }
+                    </tbody>
                 </table>
             </Panel>
         );
