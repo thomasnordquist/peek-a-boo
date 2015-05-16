@@ -154,6 +154,10 @@ var UICollection = function () {
 
         ui.listenTo(UIEvents.hostDiscovered);
         ui.listenTo(UIEvents.hostDisappeared);
+        ui.listenTo(UIEvents.persons);
+        ui.actOn(UIEvents.createPerson);
+        ui.actOn(UIEvents.getPersons);
+
     };
 
     /**

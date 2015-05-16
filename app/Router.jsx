@@ -5,6 +5,7 @@ var DefaultRoute = Router.DefaultRoute;
 
 var App = require("./App");
 var Hosts = require("./Hosts");
+var Persons = require("./Persons");
 
 // polyfill
 if(!Object.assign)
@@ -14,7 +15,7 @@ var routes = (
     <Route name="app" handler={App} path="/">
         <DefaultRoute handler={Hosts} />
         <Route name="hosts" handler={Hosts} />
-        <Route name="people" handler={Hosts} />
+        <Route name="people" handler={Persons} />
     </Route>
 );
 

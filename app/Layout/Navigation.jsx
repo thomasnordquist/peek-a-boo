@@ -20,7 +20,7 @@ var Application = React.createClass({
 					<div id="navbar" className="navbar-collapse collapse" ref="collapse">
 						<ul className="nav-items nav navbar-nav" id="navbar">
 							<li><Link className='nav-item hosts' to='hosts'>Hosts</Link></li>
-							<li><Link className='nav-item people' to='people'>People</Link></li>
+							<li><Link className='nav-item persons' to='people'>Persons</Link></li>
 						</ul>
 					</div>
 				</div>

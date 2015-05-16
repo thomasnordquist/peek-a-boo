@@ -1,4 +1,7 @@
 module.exports = {
     hostDiscovered: 'discovered',
-    hostDisappeared: 'disappeared'
+    hostDisappeared: 'disappeared',
+    createPerson: 'createPerson',
+    getPersons: 'getPersons',
+    persons: 'persons'
 };
