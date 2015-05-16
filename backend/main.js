@@ -16,7 +16,7 @@ db.people = new Datastore({filename: './stores/people.db', autoload: true});
 
 var garbage = {
 	hosts: new GarbageCollector(db.hosts, {emit: true}),
-	people: new GarbageCollector(db.people)
+	//people: new GarbageCollector(db.people, {})
 };
 
 function createPerson(target, person) {
