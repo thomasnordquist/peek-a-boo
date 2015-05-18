@@ -14,6 +14,10 @@ var db = {};
 db.hosts = new Datastore({filename: './stores/hosts.db', autoload: true});
 db.people = new Datastore({filename: './stores/people.db', autoload: true});
 
+/* Set Autocompaction Interval to 1h */
+db.hosts.persistence.setAutocompactionInterval(1000*60*60);
+db.people.persistence.setAutocompactionInterval(1000*60*60);
+
 var garbage = {
 	hosts: new GarbageCollector(db.hosts, {emit: true}),
 	//people: new GarbageCollector(db.people, {})
