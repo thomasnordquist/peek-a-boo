@@ -6,21 +6,24 @@ var UIEvents = require('../Events/UIEvents');
 var config = require('../config');
 var moment = require('moment');
 
-
 var Persons = React.createClass({
     persons: {},
     getInitialState: function(){
-        this.props.events.on(UIEvents.personDiscovered, this.addPerson);
-        this.props.events.on(UIEvents.personDisappeared, this.removePerson);
+        this.props.events.on(UIEvents.personUpdateNotification, this.updatePerson);
         this.props.events.on(UIEvents.persons, this.setPersons);
         return {persons: this.persons, personForm: null};
+    },
+    updatePerson: function(person) {
+        this.persons[person.email] = person;
+        this.refresh();
     },
     componentDidMount: function(){
         this.props.events.emit(UIEvents.getPersons);
     },
     setPersons: function(persons) {
-        console.log(persons);
-        this.persons = persons;
+        persons.forEach(function(person){
+            this.persons[person.email] = person;
+        }.bind(this));
         this.refresh();
     },
     refresh: function() {
@@ -57,11 +60,11 @@ var Persons = React.createClass({
         var renderPersons = function(key){
             var person = this.state.persons[key];
             return (
-                <tr key={person.email} className='person'>
+                <tr key={person.email + Math.random()} className='person'>
                     <td><img className='gravatar' src={ person.gravatar } /></td>
                     <td>{ person.name }</td>
                     <td className='lastSeen'>{ person.lastSeen ? moment().to(person.lastSeen) : 'never' }</td>
-                    <td className='status'>{ isOffline(person) ? 'offline' : 'online' }</td>
+                    <td className='status'>{ isOffline(person) ? <label className='offline'>offline</label> : <label className='online'>online</label> }</td>
                 </tr>
             );
         };

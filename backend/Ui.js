@@ -154,9 +154,15 @@ var UICollection = function () {
 
         ui.listenTo(UIEvents.deviceDiscovered);
         ui.listenTo(UIEvents.deviceDisappeared);
+        ui.listenTo(UIEvents.personUpdateNotification);
+        ui.listenTo(UIEvents.deviceUpdateNotification);
         ui.listenTo(UIEvents.persons);
+        ui.listenTo(UIEvents.devices);
+
         ui.actOn(UIEvents.createPerson);
         ui.actOn(UIEvents.getPersons);
+        ui.actOn(UIEvents.getDevices);
+        ui.actOn(UIEvents.setOwnerOfDevice);
 
     };
 

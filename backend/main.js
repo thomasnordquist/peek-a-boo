@@ -19,6 +19,36 @@ var garbage = {
 	//people: new GarbageCollector(db.people, {})
 };
 
+garbage.hosts.on(GarbageEvents.delete, function(host) {
+	onHostDisappearance(host);
+});
+
+var scanner = new Scanner();
+scanner.on(ScannerEvents.host, function(host) {
+	handleHost(host);
+});
+
+
+function onHostDiscovery(host) {
+	UI.emit(UIEvents.deviceDiscovered, UI.all(), host);
+}
+
+function onHostDisappearance(host) {
+	UI.emit(UIEvents.deviceDisappeared, UI.all(), host);
+}
+
+function onPersonUpdate(person) {
+	UI.emit(UIEvents.personUpdateNotification, UI.all(), person);
+}
+
+function onDeviceUpdate(person) {
+	UI.emit(UIEvents.deviceUpdateNotification, UI.all(), person);
+}
+
+function onPersonDisappearance(host) {
+	UI.emit(UIEvents.personDisappeared, UI.all(), host);
+}
+
 function createPerson(target, person) {
 	db.people.findOne( {email: person.email}, function(err, result) {
 		if(result == null) {
@@ -39,48 +69,86 @@ function getPersons(target) {
 	});
 };
 
-function handleHost(host) {
-	console.log('Handle:', host.mac);
-	db.hosts.findOne({mac: host.mac}, function(err, entry) {
-		if(entry) {
-			host = _.merge(entry, host);
-			console.log('Update:', host);
-			db.hosts.update({mac: host.mac}, host);	
+function getDevices(target) {
+	db.hosts.find({}, function(err, result) {
+		if(null == err) {
+			UI.emit(UIEvents.devices, target, result);
 		} else {
-			console.log('Insert:', host);
-			db.hosts.insert(host);	
+			console.log('Error: ', err);
 		}
-		onHostDiscovery(host);
+	});
+};
+
+function setOwnerOfDevice(target, email, mac) {
+	function updateDevice(mac, person){
+
+		db.hosts.update({mac: mac}, {$set:{owner: person}}, {}, function(err, num){
+			console.log('Update: ', num);
+			db.hosts.findOne({mac: mac}, function(err, dev) {
+				dev ? onDeviceUpdate(dev) : false;
+			})
+		});
+	}
+	function setNewOwner(email, mac){
+		if(!email || email == '' ){
+			updateDevice(mac, null);
+			return;
+		}
+
+		db.people.findOne({email: email}, function(err, person) {
+			if(null != person) {
+				if(!person.devices) {
+					person.devices = [];
+				}
+				person.devices.push({mac: mac});
+				db.people.update({email: email}, person);
+				onPersonUpdate(person);
+			}
+			updateDevice(mac, person);
+		});
+	}
+
+	db.people.findOne({"devices.mac": mac}, function(err, person) {
+		if(person) {
+			person.devices = person.devices.filter(function(dev) {
+				return dev.mac != mac;
+			});
+
+			db.people.update({email: person.email}, {$set:{devices: person.devices}}, function(err, replaced){
+				setNewOwner(email, mac);
+			});
+		} else {
+			setNewOwner(email, mac);
+		}
+	});
+
+
+};
+
+function handleHost(host) {
+	db.hosts.findOne({mac: host.mac}, function(err, entry) {
+		db.people.findOne( { "devices.mac": host.mac }, function(err, person) {
+			if(person) {
+				host.owner = person;
+				person.lastSeen = host.lastSeen;
+
+				db.people.update({email: person.email}, { $set: { lastSeen: host.lastSeen } });
+				onPersonUpdate(person);
+			}
+			if(entry) {
+				host = _.merge(entry, host);
+				db.hosts.update({mac: host.mac}, host);
+			} else {
+				db.hosts.insert(host);
+			}
+			onHostDiscovery(host);
+		});
 	}.bind(this));
 };
 
-var scanner = new Scanner();
-
-scanner.on(ScannerEvents.host, function(host) {
-	handleHost(host);
-});
-
-garbage.hosts.on(GarbageEvents.delete, function(host) {
-	onHostDisappearance(host);
-});
-
 UI.on(UIEvents.createPerson, createPerson);
 UI.on(UIEvents.getPersons, getPersons);
-
-function onHostDiscovery(host) {
-	UI.emit(UIEvents.deviceDiscovered, UI.all(), host);
-}
-
-function onHostDisappearance(host) {
-	UI.emit(UIEvents.deviceDisappeared, UI.all(), host);
-}
-
-function onPersonDiscovery(host) {
-	UI.emit(UIEvents.personDiscovered, UI.all(), host);
-}
-
-function onPersonDisappearance(host) {
-	UI.emit(UIEvents.personDisappeared, UI.all(), host);
-}
+UI.on(UIEvents.getDevices, getDevices);
+UI.on(UIEvents.setOwnerOfDevice, setOwnerOfDevice);
 
 scanner.start();
