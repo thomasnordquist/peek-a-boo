@@ -53,9 +53,18 @@ var Persons = React.createClass({
     createPerson: function(email, name){
         return this.props.events.emit(UIEvents.createPerson, {email: email, name: name});
     },
+    isOnline: function(person){
+        return ((moment().format('x')-person.lastSeen) / 1000) > config.offlineAfter;
+    },
+    sortPersons: function(persons){
+        return Object.keys(persons).sort(function(keyA, keyB) {
+            var a = persons[keyA], b = persons[keyB];
+            return Math.round((b.lastSeen-a.lastSeen) / 1000 / 30);
+       }.bind(this));
+    },
     render: function() {
         var isOffline = function(person) {
-            return (!person.lastSeen || ((moment().format('x')-person.lastSeen) / 1000) > config.offlineAfter);
+            return (!person.lastSeen || this.isOnline(person));
         };
         var renderPersons = function(key){
             var person = this.state.persons[key];
@@ -64,10 +73,12 @@ var Persons = React.createClass({
                     <td><img className='gravatar' src={ person.gravatar } /></td>
                     <td>{ person.name }</td>
                     <td className='lastSeen'>{ person.lastSeen ? moment().to(person.lastSeen) : 'never' }</td>
-                    <td className='status'>{ isOffline(person) ? <label className='offline'>offline</label> : <label className='online'>online</label> }</td>
+                    <td className='status'>{ isOffline.call(this,person) ? <label className='offline'>offline</label> : <label className='online'>online</label> }</td>
                 </tr>
             );
         };
+        var sortedPersonKeys = this.sortPersons(this.state.persons);
+        console.log(sortedPersonKeys);
         return (
             <Panel title='Persons'>
                 <table className='table table-striped persons'>
@@ -81,7 +92,7 @@ var Persons = React.createClass({
                     </thead>
                     <tbody>
 
-                        { Object.keys(this.state.persons).map(renderPersons.bind(this)) }
+                        { sortedPersonKeys.map(renderPersons.bind(this)) }
                     </tbody>
 
                 </table>
