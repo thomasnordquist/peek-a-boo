@@ -11,6 +11,7 @@ var Persons = React.createClass({
     getInitialState: function(){
         this.props.events.on(UIEvents.personUpdateNotification, this.updatePerson);
         this.props.events.on(UIEvents.persons, this.setPersons);
+        this.props.events.on(UIEvents.addPersonNotification, this.addPerson);
         return {persons: this.persons, personForm: null};
     },
     updatePerson: function(person) {
@@ -39,9 +40,7 @@ var Persons = React.createClass({
         this.refresh();
     },
     addPerson: function(person) {
-        console.log(person);
         this.persons[person.email] = person;
-
         this.refresh();
     },
     createPersonForm: function(){
@@ -51,7 +50,8 @@ var Persons = React.createClass({
         return this.setState({personForm: null});
     },
     createPerson: function(email, name){
-        return this.props.events.emit(UIEvents.createPerson, {email: email, name: name});
+        this.props.events.emit(UIEvents.createPerson, {email: email, name: name});
+        this.setState({personForm: null})
     },
     isOnline: function(person){
         return ((moment().format('x')-person.lastSeen) / 1000) > config.offlineAfter;

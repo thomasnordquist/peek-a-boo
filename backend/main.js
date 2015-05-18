@@ -58,7 +58,9 @@ function createPerson(target, person) {
 		if(result == null) {
 			person.gravatar = gravatar.url(person.email, {s: '200', r: 'pg', d: 'retro'});
 			db.people.insert(person);
+
 			UI.emit(UIEvents.people, target, [person]);
+			UI.emit(UIEvents.addPersonNotification, UI.all(), person);
 		}
 	});
 };

@@ -156,6 +156,7 @@ var UICollection = function () {
         ui.listenTo(UIEvents.deviceDisappeared);
         ui.listenTo(UIEvents.personUpdateNotification);
         ui.listenTo(UIEvents.deviceUpdateNotification);
+        ui.listenTo(UIEvents.addPersonNotification);
         ui.listenTo(UIEvents.persons);
         ui.listenTo(UIEvents.devices);
 

@@ -3,6 +3,7 @@ module.exports = {
     deviceDisappeared: 'disappeared',
     createPerson: 'createPerson',
     getPersons: 'getPersons',
+    addPersonNotification: 'addPersonNotification',
     personUpdateNotification: 'personUpdate',
     deviceUpdateNotification: 'deviceUpdate',
     persons: 'persons',
