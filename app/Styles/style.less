@@ -7,6 +7,20 @@
   .lastSeen, .status, .macColumn{
     display:none;
   }
+
+  .statusOnline:before, .statusOffline:before {
+    .glyphicon;
+    padding-right: 0.5em;
+  }
+  .statusOnline, .statusOffline {
+    .glyphicon-record;
+  }
+  .statusOnline:before {
+    color: @brand-success;
+  }
+  .statusOffline:before {
+    color: @brand-danger;
+  }
 }
 
 @media (max-width: @screen-sm) {
