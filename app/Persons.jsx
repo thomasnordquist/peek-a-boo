@@ -59,7 +59,12 @@ var Persons = React.createClass({
     sortPersonsByStatus: function(persons, keys){
         return keys.sort(function(keyA, keyB) {
             var a = persons[keyA], b = persons[keyB];
-            return Math.round((b.lastSeen-a.lastSeen) / 1000 / 60);
+            if(!a.lastSeen) {
+                return 1;
+            } else if(!b.lastSeen) {
+                return -1;
+            }
+            return Math.round((b.lastSeen-a.lastSeen)/1000/60);
         }.bind(this));
     },
     sortPersonsByName: function(persons, keys){
