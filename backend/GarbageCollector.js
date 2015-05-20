@@ -21,8 +21,8 @@ function GarbageCollector(db, options) {
 				if(options.emit) {
 					self.emit(GarbageEvents.delete, item)
 				}
-				db.remove({mac: item.mac});
 			});
+			db.remove({'lastSeen': { $lt: threshold }});
 		});
 		setTimeout(collect, config.offlineAfter*1000/4); /* 4 x frequency */
 	}
