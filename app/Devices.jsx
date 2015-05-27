@@ -87,9 +87,8 @@ var DeviceList = React.createClass({
         var renderDevices = function(key){
             var device = this.state.devices[key];
             return <tr key={device.mac}>
-                <td>{ device.ip }</td>
-                <td className='macColumn'>{ device.mac }</td>
                 <td className='hostColumn'>{ device.host }</td>
+                <td className='macColumn'>{ device.mac }</td>
                 <td>{selectOwner.call(this, device)}</td>
             </tr>
         };
@@ -98,9 +97,8 @@ var DeviceList = React.createClass({
                 <table className='table table-striped'>
                     <thead>
                         <tr>
-                            <th>IP</th>
+                            <th className='hostColumn'>Host</th>
                             <th className='macColumn'>MAC</th>
-                            <th className='hostColumn'>Hostname</th>
                             <th>Owner</th>
                         </tr>
                     </thead>

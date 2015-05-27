@@ -10,7 +10,8 @@ var config = require('../config.js');
 var opts = {
 	nmap: config.nmapBinary,
 	range: ['192.168.178.1-255'],
-	ports: [ '80', 22 ]
+	//ports: 22
+	//flags: '-sn'
 };
 
 function Scanner() {
@@ -22,9 +23,12 @@ function Scanner() {
 	var discoverTimeout = null;
 
 	function discover() {
-		libnmap.nmap('scan', _.clone(opts), function(err, report){
-			report.forEach(function(result){
-				result = result[0];
+		libnmap.nmap('discover', _.clone(opts), function(err, report){
+			if(err) {console.log('Error', err);}
+			//console.log(report);
+			report[0].neighbors.forEach(function(result){
+				//result = result[0];
+				console.log('Found: ', result);
 				handleNmapResult(result);
 			});
 			discoverTimeout = setTimeout(discover, discoverInterval);
@@ -34,18 +38,19 @@ function Scanner() {
 	function handleNmapResult(result) {
 		function reportHost(mac) {
 			var info = {
-				mac: mac, 
-				host: result.hostname, 
-				ip:result.ip, 
+				mac: mac,
+				host: result,
 				lastSeen: parseInt(moment().format('x'))
 			};
+			console.log('Resolved: ', result, mac);
 			self.emit(ScannerEvents.host, info)
 		}
-		fetchMac(result, reportHost);
+		var time = Math.round(Math.random()*2);
+		setTimeout(fetchMac, time, result, reportHost);
 	}
 
-	function fetchMac(nmapResult, callback) {
-		arp.getMAC(nmapResult.ip, function(err, mac) {
+	function fetchMac(host, callback) {
+		arp.getMAC(host, function(err, mac) {
 			if (!err) {
 				callback(mac)				
 			}
