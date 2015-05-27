@@ -24,13 +24,20 @@
       color: @nav-link-hover-bg;
     }
   }
+
   .logo:before {
-    content: "\1F648";
-    font-size:250%;
-    margin-right: 0.25em;
+    content: '';
+    background-size: contain;
+    display: inline-block;
+    width: 48px;
+    height: 48px;
+    margin-right: 8px;
+    margin-top: -14px;
+
+    background-image:url("statics/see-no-evil.png");
   }
 
   .logo:hover:before {
-    content: "\1F649";
+    background-image:url("statics/hear-no-evil.png");
   }
 }
