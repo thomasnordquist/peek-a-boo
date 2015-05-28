@@ -1,14 +1,17 @@
 'use strict';
 
+var config = require('../config');
 var Datastore = require('nedb');
 var GarbageCollector = require('./GarbageCollector');
 var gravatar = require('gravatar');
-var Scanner = require('./Scanner');
 var ScannerEvents = require('../Events/Scanner');
 var GarbageEvents = require('../Events/GarbageCollector');
 var UI = require('./Ui')({port: 8080, serverMode: 'dev'});
 var _ = require('lodash');
 var UIEvents = require('../Events/UIEvents');
+
+var io = require('socket.io-client');
+var events = io.connect(config.discoveryUrl);
 
 var db = {};
 db.hosts = new Datastore({filename: './stores/hosts.db', autoload: true});
@@ -27,11 +30,9 @@ garbage.hosts.on(GarbageEvents.delete, function(host) {
 	onHostDisappearance(host);
 });
 
-var scanner = new Scanner();
-scanner.on(ScannerEvents.host, function(host) {
+events.on(ScannerEvents.host, function(host) {
 	handleHost(host);
 });
-
 
 function onHostDiscovery(host) {
 	UI.emit(UIEvents.deviceDiscovered, UI.all(), host);
@@ -157,4 +158,4 @@ UI.on(UIEvents.getPersons, getPersons);
 UI.on(UIEvents.getDevices, getDevices);
 UI.on(UIEvents.setOwnerOfDevice, setOwnerOfDevice);
 
-scanner.start();
+//scanner.start();

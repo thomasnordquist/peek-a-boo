@@ -1,16 +1,11 @@
-# peek-a-boo
+# Peek-A-Boo
 
-### start service 
-`npm start`
+The Application consists of two parts, one discovering the network (Discovery `npm run discover`), the other part handles the received data and serves the application (`npm run app`).
+The separation allows the application to run on different machines in different networks (Apl)
 
-### Discover service 
-`npm run discover`
-
-The discover service runs on its own and pushes network updates over a socket.io server
-
-### start development server 
+### Build development assets
 `npm run dev`
 
-###build assets 
+### Build production assets
 `npm run build`
 
