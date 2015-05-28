@@ -55,7 +55,7 @@ function onPersonDisappearance(host) {
 function createPerson(target, person) {
 	db.people.findOne( {email: person.email}, function(err, result) {
 		if(result == null) {
-			person.gravatar = gravatar.url(person.email, {s: '200', r: 'pg', d: 'retro'});
+			person.gravatar = gravatar.url(person.email, {s: '200', r: 'x', d: 'mm'});
 			db.people.insert(person);
 
 			UI.emit(UIEvents.people, target, [person]);
