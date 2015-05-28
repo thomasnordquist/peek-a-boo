@@ -159,6 +159,8 @@ var UICollection = function () {
         ui.listenTo(UIEvents.addPersonNotification);
         ui.listenTo(UIEvents.persons);
         ui.listenTo(UIEvents.devices);
+        ui.listenTo(UIEvents.notifyPersonOnline);
+        ui.listenTo(UIEvents.notifyPersonOffline);
 
         ui.actOn(UIEvents.createPerson);
         ui.actOn(UIEvents.getPersons);

@@ -29,7 +29,7 @@
     "compression": "^1.4.4",
     "express": "^4.12.3",
     "extract-text-webpack-plugin": "^0.8.0",
-    "file-loader": "^0.8.1",
+    "file-loader": "^0.8.4",
     "gravatar": "^1.1.1",
     "lodash": "^3.9.3",
     "moment": "^2.10.3",

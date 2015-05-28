@@ -5,6 +5,16 @@ var RouteHandler = require("react-router").RouteHandler;
 require('./Styles/style.less');
 var io = require('socket.io-client');
 var events = io.connect(window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: ''));
+var UIEvents = require('../Events/UIEvents');
+var notify = require('./Notify');
+
+events.on(UIEvents.notifyPersonOnline, function(person) {
+    notify(person.name, {image: person.gravatar, body: 'is now at the office'});
+});
+
+events.on(UIEvents.notifyPersonOffline, function(person) {
+    notify(person.name, {image: person.gravatar, body: 'just left the office'});
+});
 
 var Application = React.createClass({
     render: function() {

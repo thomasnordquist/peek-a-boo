@@ -9,5 +9,8 @@ module.exports = {
     persons: 'persons',
     devices: 'devices',
     getDevices: 'getDevices',
-    setOwnerOfDevice: 'setOwnerOfDevice'
+    setOwnerOfDevice: 'setOwnerOfDevice',
+    notifyPersonOffline: 'userOffline',
+    notifyPersonOnline: 'userOnline'
+
 };

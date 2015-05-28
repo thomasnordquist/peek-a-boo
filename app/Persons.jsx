@@ -5,6 +5,7 @@ var io = require('socket.io-client');
 var UIEvents = require('../Events/UIEvents');
 var config = require('../config');
 var moment = require('moment');
+var NotificationSettings = require('./NotificationSettings');
 
 var Persons = React.createClass({
     persons: {},
@@ -97,7 +98,7 @@ var Persons = React.createClass({
 
         console.log(sortedPersonKeys);
         return (
-            <Panel title='Persons'>
+            <Panel title='Persons' controls={<NotificationSettings />}>
                 <table className='table table-striped persons'>
                     <thead>
                         <tr>

@@ -1,6 +1,7 @@
 'use strict';
 
 var config = require('../config');
+var moment = require('moment');
 var Datastore = require('nedb');
 var GarbageCollector = require('./GarbageCollector');
 var gravatar = require('gravatar');
@@ -17,8 +18,8 @@ var db = {};
 db.hosts = new Datastore();
 db.people = new Datastore({filename: './stores/people.db', autoload: true});
 
-/* Set Autocompaction Interval to 1h */
-db.people.persistence.setAutocompactionInterval(1000*60*60);
+/* Set Autocompaction Interval to 5m */
+db.people.persistence.setAutocompactionInterval(1000*60*5);
 
 var garbage = {
 	hosts: new GarbageCollector(db.hosts, {emit: true})
@@ -135,9 +136,16 @@ function handleHost(host) {
 		db.people.findOne( { "devices.mac": host.mac }, function(err, person) {
 			if(person) {
 				host.owner = person;
-				person.lastSeen = host.lastSeen;
 
-				db.people.update({email: person.email}, { $set: { lastSeen: host.lastSeen } });
+				db.people.update(
+					{email: person.email},
+					{
+						$set: {
+							lastSeen: host.lastSeen
+					    }
+					}
+				);
+				person.lastSeen = person.lastSeen;
 				onPersonUpdate(person);
 			}
 			if(entry) {
@@ -151,9 +159,46 @@ function handleHost(host) {
 	}.bind(this));
 };
 
+function detectPersonsGoingOffline() {
+	var detectQuery = { lastSeen: {$lt: offlineThreshold()}, online: true };
+
+	db.people.find(detectQuery, function(err, persons) {
+		persons.forEach(function(person) {
+			UI.emit(UIEvents.notifyPersonOffline, UI.all(), person);
+		});
+		db.people.update(detectQuery, {$set:{online: false}});
+	});
+}
+
+function detectPersonsComingOnline() {
+	var detectQuery = { lastSeen: {$gt: offlineThreshold()} };
+	db.people.find(detectQuery, function(err, persons) {
+		persons.forEach(function(person) {
+			if(!person.online) {
+				UI.emit(UIEvents.notifyPersonOnline, UI.all(), person);
+			}
+		});
+		db.people.update(detectQuery, {$set:{online: true}});
+	});
+}
+
+function offlineThreshold() {
+	return parseInt(moment().format('x')) - (config.offlineAfter * 1000);
+}
+
+function isPersonOffline(person) {
+	return ((moment().format('x')-person.lastSeen) / 1000) > config.offlineAfter;
+}
+
+function cronJob() {
+	detectPersonsComingOnline();
+	detectPersonsGoingOffline();
+	setTimeout(cronJob, 2500); /*2.5 s*/
+}
+
+cronJob();
+
 UI.on(UIEvents.createPerson, createPerson);
 UI.on(UIEvents.getPersons, getPersons);
 UI.on(UIEvents.getDevices, getDevices);
 UI.on(UIEvents.setOwnerOfDevice, setOwnerOfDevice);
-
-//scanner.start();
