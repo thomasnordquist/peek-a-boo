@@ -1,5 +1,4 @@
 var config = require('../config');
-var io = require('socket.io-client');
 var Scanner = require('./Scanner');
 var ScannerEvents = require('../Events/Scanner');
 
