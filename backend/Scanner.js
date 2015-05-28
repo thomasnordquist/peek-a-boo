@@ -9,9 +9,7 @@ var config = require('../config.js');
 
 var opts = {
 	nmap: config.nmapBinary,
-	range: ['192.168.178.1-255'],
-	//ports: 22
-	//flags: '-sn'
+	range: ['192.168.178.1-255']
 };
 
 function Scanner() {
