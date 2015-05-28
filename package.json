@@ -3,6 +3,7 @@
   "scripts": {
     "🙈": "node backend/main.js",
     "start": "node backend/main.js",
+    "discover": "node backend/Discover.js",
     "dev": "webpack-dev-server --config config/webpack/webpack-dev-server.config.js --progress --colors --port 2992 --inline",
     "build": "webpack --config config/webpack/webpack-production.config.js --progress --profile --colors",
     "assets": "node lib/server-development",

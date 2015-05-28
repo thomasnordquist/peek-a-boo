@@ -6,4 +6,5 @@
 	 offlineAfter: 60*5, /* 5 minutes */
 	 nmapBinary: '/usr/bin/nmap',
 	 discoverInterval: 2,
+	 discoverPort: 8080 /* discover server pushes information on this port */
 };
