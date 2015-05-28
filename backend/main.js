@@ -14,16 +14,14 @@ var io = require('socket.io-client');
 var events = io.connect(config.discoveryUrl);
 
 var db = {};
-db.hosts = new Datastore({filename: './stores/hosts.db', autoload: true});
+db.hosts = new Datastore();
 db.people = new Datastore({filename: './stores/people.db', autoload: true});
 
 /* Set Autocompaction Interval to 1h */
-db.hosts.persistence.setAutocompactionInterval(1000*60*60);
 db.people.persistence.setAutocompactionInterval(1000*60*60);
 
 var garbage = {
-	hosts: new GarbageCollector(db.hosts, {emit: true}),
-	//people: new GarbageCollector(db.people, {})
+	hosts: new GarbageCollector(db.hosts, {emit: true})
 };
 
 garbage.hosts.on(GarbageEvents.delete, function(host) {
