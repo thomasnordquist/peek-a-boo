@@ -6,7 +6,7 @@ var GarbageCollector = require('./GarbageCollector');
 var gravatar = require('gravatar');
 var ScannerEvents = require('../Events/Scanner');
 var GarbageEvents = require('../Events/GarbageCollector');
-var UI = require('./Ui')({port: 8080, serverMode: 'dev'});
+var UI = require('./Ui')({port: config.applicationPort, serverMode: 'dev'});
 var _ = require('lodash');
 var UIEvents = require('../Events/UIEvents');
 
