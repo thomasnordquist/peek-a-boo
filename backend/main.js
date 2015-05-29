@@ -187,7 +187,7 @@ function offlineThreshold() {
 }
 
 function isPersonOffline(person) {
-	return ((moment().format('x')-person.lastSeen) / 1000) > config.offlineAfter;
+	return person.lastSeen < offlineThreshold();
 }
 
 function cronJob() {
