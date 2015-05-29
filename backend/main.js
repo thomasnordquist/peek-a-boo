@@ -171,7 +171,7 @@ function detectPersonsGoingOffline() {
 }
 
 function detectPersonsComingOnline() {
-	var detectQuery = { lastSeen: {$gt: offlineThreshold()}, online: false };
+	var detectQuery = { lastSeen: {$gt: offlineThreshold()}, online: { $ne: true } };
 	db.people.find(detectQuery, function(err, persons) {
 		persons.forEach(function(person) {
 			if(!person.online) {
