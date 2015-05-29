@@ -26,9 +26,9 @@ var NotificationSettings = React.createClass({
         if( !this.notificationsAvailable() ) {
             return null;
         } else if( !this.notificationsEnabled() ) {
-            return <div onClick={this.requestPermissions} className='notificationSettings'>Enable</div>;
+            return <a onClick={this.requestPermissions} className='notificationSettings'>Notify Me</a>;
         } else {
-            return <div onClick={this.disablePermissions} className='notificationSettings'>Disable</div>;
+            return <a onClick={this.disablePermissions} className='notificationSettings'>Disable</a>;
         }
     }
 });
