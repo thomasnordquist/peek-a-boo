@@ -145,7 +145,7 @@ function handleHost(host) {
 					    }
 					}
 				);
-				person.lastSeen = person.lastSeen;
+				person.lastSeen = host.lastSeen;
 				onPersonUpdate(person);
 			}
 			if(entry) {
