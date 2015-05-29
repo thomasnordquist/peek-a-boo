@@ -10,7 +10,7 @@ module.exports = function Notify(text, opt) {
 
     var timeout = opt.timeout || 2000;
     var image = opt.image || defaultImage;
-    var body = opt.body || null;
+    var body = opt.body || '';
 
     console.log(defaultImage);
 
