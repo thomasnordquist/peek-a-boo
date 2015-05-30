@@ -65,9 +65,21 @@
 
 .gravatar {
   .media-object;
+  position:relative;
   padding-bottom: @padding-base-vertical / 4;
   padding-top: @padding-base-vertical / 4;
   height: 64px;
+  transition: all .2s ease-in-out;
+  z-index:20;
+}
+
+.gravatar:hover {
+  transform: scale(1.4);
+}
+
+.gravatar:active {
+  z-index:100;
+  transform: translate(64px,0) scale(4);
 }
 
 table.persons {
