@@ -4,3 +4,4 @@ build/
 stores/*.db
 *.iml
 npm-debug.log
+config.js
