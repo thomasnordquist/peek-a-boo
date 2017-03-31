@@ -1,9 +1,9 @@
 const React = require('react')
-const moment = require('moment')
 const TableRow = require('./TableRow')
+const Person = require('../../Models/Person')
 
-const PersonTable = React.createClass({
-  sortPersonsByStatus(persons, keys) {
+class PersonTable extends React.Component {
+  static sortPersonsByStatus(persons, keys) {
     return keys.sort((keyA, keyB) => {
       const a = persons[keyA]
       const b = persons[keyB]
@@ -15,8 +15,9 @@ const PersonTable = React.createClass({
       }
       return Math.round((b.lastSeen() - a.lastSeen()) / 1000 / 60)
     })
-  },
-  sortPersonsByName(persons, keys) {
+  }
+
+  static sortPersonsByName(persons, keys) {
     return keys.sort((keyA, keyB) => {
       const a = persons[keyA]
       const b = persons[keyB]
@@ -25,15 +26,21 @@ const PersonTable = React.createClass({
       if (a.name > b.name) { return 1 }
       return 0
     })
-  },
+  }
+
   renderPerson(key) {
     const person = this.props.persons[key]
     return <TableRow key={person.email} person={person} />
-  },
+  }
+
   render() {
-        /* sort lastSeen desc, name asc */
-    let sortedPersonKeys = this.sortPersonsByName(this.props.persons, Object.keys(this.props.persons))
-    sortedPersonKeys = this.sortPersonsByStatus(this.props.persons, sortedPersonKeys)
+    /* sort lastSeen desc, name asc */
+    let sortedPersonKeys = PersonTable.sortPersonsByName(
+      this.props.persons,
+      Object.keys(this.props.persons),
+    )
+
+    sortedPersonKeys = PersonTable.sortPersonsByStatus(this.props.persons, sortedPersonKeys)
 
     return (<table className="table table-striped persons">
       <thead>
@@ -49,6 +56,10 @@ const PersonTable = React.createClass({
       </tbody>
 
     </table>)
-  },
-})
+  }
+}
+
+PersonTable.propTypes = {
+  persons: React.PropTypes.arrayOf(React.PropTypes.instanceOf(Person)).isRequired,
+}
 module.exports = PersonTable
