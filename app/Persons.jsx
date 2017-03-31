@@ -1,3 +1,4 @@
+const Person = require('../Models/Person')
 const React = require('react')
 const Panel = require('./Layout/Panel')
 const PersonForm = require('./PersonForm')
@@ -16,7 +17,8 @@ const Persons = React.createClass({
     return { persons: this.persons, personForm: null }
   },
   updatePerson(person) {
-    this.persons[person.email] = person
+    this.persons[person.email] = new Person(person)
+    console.log(this.persons[person.email])
     this.refresh()
   },
   componentDidMount() {
@@ -24,7 +26,7 @@ const Persons = React.createClass({
   },
   setPersons(persons) {
     persons.forEach((person) => {
-      this.persons[person.email] = person
+      this.persons[person.email] = new Person(person)
     })
     this.refresh()
   },
@@ -45,7 +47,9 @@ const Persons = React.createClass({
     this.refresh()
   },
   createPersonForm() {
-    return this.setState({ personForm: <PersonForm onAbort={this.abortPersonCreation} onAddPerson={this.createPerson} /> })
+    return this.setState({
+      personForm: <PersonForm onAbort={this.abortPersonCreation} onAddPerson={this.createPerson} />,
+    })
   },
   abortPersonCreation() {
     return this.setState({ personForm: null })

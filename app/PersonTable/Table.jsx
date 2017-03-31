@@ -5,20 +5,22 @@ const TableRow = require('./TableRow')
 const PersonTable = React.createClass({
   sortPersonsByStatus(persons, keys) {
     return keys.sort((keyA, keyB) => {
-      let a = persons[keyA],
-        b = persons[keyB]
-      if (!a.lastSeen) {
+      const a = persons[keyA]
+      const b = persons[keyB]
+
+      if (!a.lastSeen()) {
         return 1
-      } else if (!b.lastSeen) {
+      } else if (!b.lastSeen()) {
         return -1
       }
-      return Math.round((b.lastSeen - a.lastSeen) / 1000 / 60)
+      return Math.round((b.lastSeen() - a.lastSeen()) / 1000 / 60)
     })
   },
   sortPersonsByName(persons, keys) {
     return keys.sort((keyA, keyB) => {
-      let a = persons[keyA],
-        b = persons[keyB]
+      const a = persons[keyA]
+      const b = persons[keyB]
+
       if (a.name < b.name) { return -1 }
       if (a.name > b.name) { return 1 }
       return 0
