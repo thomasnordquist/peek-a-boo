@@ -1,35 +1,34 @@
-var React = require('react');
-var notify = require('Notify');
-var NotificationSettings = React.createClass({
-    getInitialState: function(){
-        return {};
-    },
-    notificationsAvailable: function() {
-        return ("Notification" in window);
-    },
-    notificationsEnabled: function() {
-        return (Notification.permission === "granted");
-    },
-    requestPermissions: function() {
-        var self = this;
-        Notification.requestPermission(function (permission) {
-            if (permission === "granted") {
-                notify("Notifications enabled");
-                self.setState({enabled: true});
-            }
-        });
-    },
-    disablePermissions: function() {
-        notify('Revoke permissions by clicking on the icon in your address bar', {timeout: 5000});
-    },
-    render: function() {
-        if( !this.notificationsAvailable() ) {
-            return null;
-        } else if( !this.notificationsEnabled() ) {
-            return <a onClick={this.requestPermissions} className='notificationSettings'>Notify Me</a>;
-        } else {
-            return <a onClick={this.disablePermissions} className='notificationSettings'>Disable</a>;
-        }
+const React = require('react')
+const notify = require('./Notify')
+const NotificationSettings = React.createClass({
+  getInitialState() {
+    return {}
+  },
+  notificationsAvailable() {
+    return ('Notification' in window)
+  },
+  notificationsEnabled() {
+    return (Notification.permission === 'granted')
+  },
+  requestPermissions() {
+    const self = this
+    Notification.requestPermission((permission) => {
+      if (permission === 'granted') {
+        notify('Notifications enabled')
+        self.setState({ enabled: true })
+      }
+    })
+  },
+  disablePermissions() {
+    notify('Revoke permissions by clicking on the icon on th left side in your address bar', { timeout: 5000 })
+  },
+  render() {
+    if (!this.notificationsAvailable()) {
+      return null
+    } else if (!this.notificationsEnabled()) {
+      return <a onClick={this.requestPermissions} className="notificationSettings">Notify Me</a>
     }
-});
-module.exports = NotificationSettings;
+    return <a onClick={this.disablePermissions} className="notificationSettings">Disable</a>
+  },
+})
+module.exports = NotificationSettings

@@ -4,7 +4,7 @@ module.exports = [
 		longTermCaching: true,
 		separateStylesheet: false,
 		minimize: true,
-		devtool: "source-map"
+		//devtool: "source-map"
 	}),
 	/*require("./make-webpack-config")({
 		prerender: true
