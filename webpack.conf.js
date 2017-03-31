@@ -9,7 +9,7 @@ module.exports = {
     path: `${__dirname}/build/public`,
     filename: '[name].bundle.js',
     chunkFilename: '[id].bundle.js',
-    publicPath: '/public/',
+    publicPath: '/_assets/',
   },
   resolve: {
     extensions: ['.js', '.jsx'],
