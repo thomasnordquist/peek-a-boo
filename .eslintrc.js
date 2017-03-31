@@ -34,7 +34,7 @@ module.exports = {
             "warn"
         ],
         "no-console": [
-            "warn"
+            "off"
         ],
         "no-restricted-syntax": [
             "off"
