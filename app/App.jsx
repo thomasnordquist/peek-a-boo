@@ -1,13 +1,14 @@
+require('./Styles/style.less')
+
 const html = require('./index.html')
 const React = require('react')
 const Navigation = require('./Layout/Navigation')
 const RouteHandler = require('react-router').RouteHandler
-
-require('./Styles/style.less')
 const io = require('socket.io-client')
-const events = io.connect(`${window.location.protocol}//${window.location.hostname}${window.location.port ? `:${window.location.port}` : ''}`)
 const UIEvents = require('../Events/UIEvents')
 const notify = require('./Notify.jsx')
+
+const events = io.connect(`${window.location.protocol}//${window.location.hostname}${window.location.port ? `:${window.location.port}` : ''}`)
 
 events.on(UIEvents.notifyPersonOnline, (person) => {
   notify(person.name, { image: person.gravatar, body: 'is now at the office' })

@@ -1,6 +1,5 @@
 const inheritance = require('util')
 const EventEmitter = require('events').EventEmitter
-const Server = require('./Server')
 const UIEvents = require('../Events/UIEvents')
 
 require('array.prototype.find')

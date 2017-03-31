@@ -1,7 +1,3 @@
-
-
-const config = require('../config')
-const moment = require('moment')
 const Datastore = require('nedb')
 const gravatar = require('gravatar')
 const UI = require('./Ui')({ port: config.applicationPort, serverMode: 'dev' })
