@@ -1,15 +1,33 @@
 const React = require('react')
 const notify = require('./Notify')
-const NotificationSettings = React.createClass({
-  getInitialState() {
-    return {}
-  },
-  notificationsAvailable() {
+
+class NotificationSettings extends React.Component {
+  static notificationsAvailable() {
     return ('Notification' in window)
-  },
-  notificationsEnabled() {
+  }
+
+  static notificationsEnabled() {
     return (Notification.permission === 'granted')
-  },
+  }
+
+  static disablePermissions() {
+    notify('Revoke permissions by clicking on the icon on th left side in your address bar', { timeout: 5000 })
+  }
+
+  static disableNotificationButton() {
+    return (<button
+      onClick={NotificationSettings.disablePermissions}
+      className="notificationSettings"
+    >
+      Disable
+    </button>)
+  }
+
+  constructor(props) {
+    super(props)
+    this.state = {}
+  }
+
   requestPermissions() {
     const self = this
     Notification.requestPermission((permission) => {
@@ -18,17 +36,18 @@ const NotificationSettings = React.createClass({
         self.setState({ enabled: true })
       }
     })
-  },
-  disablePermissions() {
-    notify('Revoke permissions by clicking on the icon on th left side in your address bar', { timeout: 5000 })
-  },
+  }
+
   render() {
-    if (!this.notificationsAvailable()) {
+    if (!NotificationSettings.notificationsAvailable()) {
       return null
-    } else if (!this.notificationsEnabled()) {
-      return <a onClick={this.requestPermissions} className="notificationSettings">Notify Me</a>
+    } else if (!NotificationSettings.notificationsEnabled()) {
+      return (<button href="#" onClick={this.requestPermissions} className="notificationSettings">
+        Notify Me
+      </button>)
     }
-    return <a onClick={this.disablePermissions} className="notificationSettings">Disable</a>
-  },
-})
+    return NotificationSettings.disableNotificationButton()
+  }
+}
+
 module.exports = NotificationSettings

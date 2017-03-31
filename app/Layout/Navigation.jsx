@@ -3,19 +3,26 @@ const Link = require('react-router').Link
 
 require('bootstrap/js/collapse')
 
-const Application = React.createClass({
+class Application extends React.Component {
   render() {
     return (
       <nav className="navbar navbar-default">
         <div className="container-fluid">
           <div className="navbar-header">
-            <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <button
+              type="button"
+              className="navbar-toggle collapsed"
+              data-toggle="collapse"
+              data-target="#navbar"
+              aria-expanded="false"
+              aria-controls="navbar"
+            >
               <span className="sr-only">Toggle navigation</span>
               <span className="icon-bar" />
               <span className="icon-bar" />
               <span className="icon-bar" />
             </button>
-            <a className="logo navbar-brand" href="#">Peek-A-Boo</a>
+            <a className="logo navbar-brand">Peek-A-Boo</a>
           </div>
           <div id="navbar" className="navbar-collapse collapse" ref="collapse">
             <ul className="nav-items nav navbar-nav" id="navbar">
@@ -26,6 +33,7 @@ const Application = React.createClass({
         </div>
       </nav>
     )
-  },
-})
+  }
+}
+
 module.exports = Application
