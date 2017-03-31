@@ -1,3 +1,5 @@
+const server = require('../lib/server')
+
 function Server(options) {
   const serverOptions = {
     prod: {
@@ -11,6 +13,6 @@ function Server(options) {
       defaultPort: options.port,
     },
   }
-  return require('../lib/server')(serverOptions[options.serverMode])
+  return server(serverOptions[options.serverMode])
 }
 module.exports = Server

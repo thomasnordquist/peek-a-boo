@@ -1,93 +1,88 @@
 const Datastore = require('nedb')
-const gravatar = require('gravatar')
-const UI = require('./Ui')({ port: config.applicationPort, serverMode: 'dev' })
-const _ = require('lodash')
+const config = require('../config')
+const Server = require('./Server')
+const Person = require('../Models/Person')
+const axios = require('axios')
+
+const { app, server } = new Server({ port: config.applicationPort, serverMode: 'dev' })
+const UI = require('./Ui')(server)
 const UIEvents = require('../Events/UIEvents')
 
 const db = {}
-db.hosts = new Datastore()
+db.hosts = []
+db.persons = {}
 db.people = new Datastore({ filename: './stores/people.db', autoload: true })
 
+function loadPersons() {
+  return new Promise((resolve) => {
+    db.people.find({}, (err, persons) => {
+      persons
+        .map(person => new Person(person))
+        .forEach((person) => {
+          // Merge current devices into new persons
+          if (db.persons[person.email]) {
+            person.devices = db.persons[person.email].devices
+          }
+          // Refresh person
+          db.persons[person.email] = person
+        })
+      resolve(Object.values(db.persons))
+    })
+  })
+}
 /* Set Autocompaction Interval to 5m */
 db.people.persistence.setAutocompactionInterval(1000 * 60 * 5)
 
-/* garbage.hosts.on(GarbageEvents.delete, (host) => {
-  onHostDisappearance(host)
-})
-
-events.on(ScannerEvents.host, (host) => {
-  handleHost(host)
-})
-*/
-
-function onHostDiscovery(host) {
+/* function onHostDiscovery(host) {
   UI.emit(UIEvents.deviceDiscovered, UI.all(), host)
-}
+}*/
 
-function onHostDisappearance(host) {
+/* function onHostDisappearance(host) {
   UI.emit(UIEvents.deviceDisappeared, UI.all(), host)
-}
-
-function onPersonUpdate(person) {
-  UI.emit(UIEvents.personUpdateNotification, UI.all(), person)
-}
+}*/
 
 function onDeviceUpdate(person) {
   UI.emit(UIEvents.deviceUpdateNotification, UI.all(), person)
 }
 
-function onPersonDisappearance(host) {
+/* function onPersonDisappearance(host) {
   UI.emit(UIEvents.personDisappeared, UI.all(), host)
+}*/
+
+function onPersonUpdate(person) {
+  db.persons[person.email] = person
+  UI.emit(UIEvents.personUpdateNotification, UI.all(), person)
 }
 
-function createPerson(target, person) {
-  db.people.findOne({ email: person.email }, (err, result) => {
+function createPerson(person) {
+  db.people.findOne({ email: person.email }, async (err, result) => {
     if (result == null) {
-      person.gravatar = gravatar.url(person.email, { s: '256', r: 'x', d: 'mm' })
+      await person.updateAvatars()
       db.people.insert(person)
 
-      UI.emit(UIEvents.people, target, [person])
+      UI.emit(UIEvents.people, UI.all(), [person])
       UI.emit(UIEvents.addPersonNotification, UI.all(), person)
+      loadPersons()
     }
   })
 }
 
 function getPersons(target) {
-  db.people.find({}, (err, result) => {
-    if (err == null) {
-      UI.emit(UIEvents.persons, target, result)
-    } else {
-      console.log('Error: ', err)
-    }
-  })
+  loadPersons()
+    .then((persons) => {
+      UI.emit(UIEvents.persons, target, persons)
+    })
 }
 
 function getDevices(target) {
-  db.hosts.find({}, (err, result) => {
-    if (err == null) {
-      UI.emit(UIEvents.devices, target, result)
-    } else {
-      console.log('Error: ', err)
-    }
-  })
+  UI.emit(UIEvents.devices, target, db.devices)
 }
 
 function setOwnerOfDevice(target, email, mac) {
-  function updateDevice(mac, person) {
-    db.hosts.update({ mac }, { $set: { owner: person } }, {}, (err, num) => {
-      console.log('Update: ', num)
-      db.hosts.findOne({ mac }, (err, dev) => {
-        dev ? onDeviceUpdate(dev) : false
-      })
-    })
+  if (!email || email === '') {
+    return
   }
-
   function setNewOwner(email, mac) {
-    if (!email || email == '') {
-      updateDevice(mac, null)
-      return
-    }
-
     db.people.findOne({ email }, (err, person) => {
       if (person != null) {
         if (!person.devices) {
@@ -96,8 +91,8 @@ function setOwnerOfDevice(target, email, mac) {
         person.devices.push({ mac })
         db.people.update({ email }, person)
         onPersonUpdate(person)
+        loadPersons()
       }
-      updateDevice(mac, person)
     })
   }
 
@@ -114,74 +109,80 @@ function setOwnerOfDevice(target, email, mac) {
   })
 }
 
-function handleHost(host) {
-  db.hosts.findOne({ mac: host.mac }, (err, entry) => {
-    db.people.findOne({ 'devices.mac': host.mac }, (err, person) => {
+function personForDevice(device) {
+  return new Promise((resolve) => {
+    db.people.findOne({ 'devices.mac': device.mac }, (err, person) => {
       if (person) {
-        host.owner = person
-
-        db.people.update(
-					{ email: person.email },
-          {
-            $set: {
-              lastSeen: host.lastSeen,
-					  },
-          })
-        person.lastSeen = host.lastSeen
-        onPersonUpdate(person)
-      }
-
-      if (entry) {
-        host = _.merge(entry, host)
-        db.hosts.update({ mac: host.mac }, host)
+        const personInstance = new Person(person)
+        personInstance.devices.push(device)
+        resolve(personInstance)
       } else {
-        db.hosts.insert(host)
-      }
-      onHostDiscovery(host)
-    })
-  })
-}
-
-function detectPersonsGoingOffline() {
-  const detectQuery = { lastSeen: { $lt: offlineThreshold() }, online: true }
-
-  db.people.find(detectQuery, (err, persons) => {
-    persons.forEach((person) => {
-      UI.emit(UIEvents.notifyPersonOffline, UI.all(), person)
-    })
-    db.people.update(detectQuery, { $set: { online: false } })
-  })
-}
-
-function detectPersonsComingOnline() {
-  const detectQuery = { lastSeen: { $gt: offlineThreshold() }, online: { $ne: true } }
-  db.people.find(detectQuery, (err, persons) => {
-    persons.forEach((person) => {
-      if (!person.online) {
-        UI.emit(UIEvents.notifyPersonOnline, UI.all(), person)
+        resolve(null)
       }
     })
-    db.people.update(detectQuery, { $set: { online: true } })
   })
 }
 
-function offlineThreshold() {
-  return parseInt(moment().format('x')) - (config.offlineAfter * 1000)
+async function personsForDeviceList(devices) {
+  // Fetch a person for every device
+  const promises = devices.map(personForDevice)
+  let persons = await Promise.all(promises)
+
+  // Remove undefined
+  persons = persons.filter(p => p)
+
+  // Group devices by persons
+  const personGroup = {}
+  persons.forEach((person) => {
+    if (!personGroup[person.email]) {
+      personGroup[person.email] = person
+    } else {
+      personGroup[person.email].devices.push(person.devices[0])
+    }
+  })
+
+  return Object.values(personGroup)
 }
 
-function isPersonOffline(person) {
-  return person.lastSeen < offlineThreshold()
+const previousDevices = []
+app.post('/api/devices', async (req, res) => {
+  res.send({})
+  const devices = req.body
+  db.devices = devices
+
+  const onlinePersons = await personsForDeviceList(devices)
+  onlinePersons.forEach(person => onPersonUpdate(person))
+
+  console.log('online', onlinePersons)
+  const newDevices = devices.filter(d => !previousDevices.find(pd => pd.mac === d.mac))
+  const removedDevices = previousDevices.filter(d => !devices.find(pd => pd.mac === d.mac))
+})
+
+app.get('/api/persons', async (req, res) => {
+  const persons = await loadPersons()
+  res.send(persons)
+})
+
+app.put('/api/person', (req, res) => {
+  const person = new Person(req.body)
+  createPerson(person)
+})
+
+app.get('/api/devices', (req, res) => {
+  res.send(db.devices)
+})
+
+function cron() {
+  db.people.find({}, (err, persons) => {
+    persons.forEach(async (p) => {
+      const person = new Person(p)
+      await person.updateAvatars()
+      db.people.update({ email: person.email }, person)
+    })
+  })
+  setTimeout(cron, 60 * 1000) // Hourly
 }
 
-function cronJob() {
-  detectPersonsComingOnline()
-  detectPersonsGoingOffline()
-  setTimeout(cronJob, 2500) /* 2.5 s*/
-}
+cron()
 
-cronJob()
-
-UI.on(UIEvents.createPerson, createPerson)
-UI.on(UIEvents.getPersons, getPersons)
-UI.on(UIEvents.getDevices, getDevices)
 UI.on(UIEvents.setOwnerOfDevice, setOwnerOfDevice)

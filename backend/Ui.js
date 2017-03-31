@@ -171,11 +171,9 @@ const UICollection = function () {
 
 inheritance.inherits(UI, EventEmitter)
 
-function UserInterface(options) {
-  const server = new Server(options)
-
+function UserInterface(expressServer) {
   const collection = new UICollection()
-  new SocketUI(collection, server.server)
+  new SocketUI(collection, expressServer)
   return collection
 }
 

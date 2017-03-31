@@ -3,6 +3,8 @@ const Panel = require('./Layout/Panel')
 const Person = require('../Models/Person')
 const Device = require('../Models/Device')
 const UIEvents = require('../Events/UIEvents')
+const Api = require('./Api')
+
 require('array.prototype.find')
 
 class DeviceList extends React.Component {
@@ -17,12 +19,16 @@ class DeviceList extends React.Component {
   componentWillMount() {
     this.registerEvents()
 
-    this.props.events.emit(UIEvents.getPersons)
-    this.props.events.emit(UIEvents.getDevices)
+    Api.getPersons().then(persons => this.setPersons(persons))
+    Api.getDevices().then(devices => this.setDevices(devices))
   }
 
-  setOwnerForDevice(device, event) {
-    const email = event.target.value
+  componentWillUnmount() {
+    this.unregisterEvents()
+  }
+
+  setOwnerForDevice(device, email) {
+    // const email = event.target.value
     this.props.events.emit(UIEvents.setOwnerOfDevice, email, device.mac)
   }
 
@@ -53,13 +59,24 @@ class DeviceList extends React.Component {
   }
 
   registerEvents() {
-    this.props.events.on(UIEvents.deviceDiscovered, res => this.addDevice(res))
-    this.props.events.on(UIEvents.deviceDisappeared, res => this.removeDevice(res))
-    this.props.events.on(UIEvents.personUpdateNotification, res => this.updatePerson(res))
-    this.props.events.on(UIEvents.deviceUpdateNotification, res => this.updateDevice(res))
-    this.props.events.on(UIEvents.persons, res => this.setPersons(res))
-    this.props.events.on(UIEvents.devices, res => this.setDevices(res))
+    this.deviceDiscoveredEventHandler = res => this.addDevice(res)
+    this.deviceDisappearedEventHandler = res => this.removeDevice(res)
+    this.personUpdateEventHandler = res => this.updatePerson(res)
+    this.deviceUpdateEventHandler = res => this.updateDevice(res)
+
+    this.props.events.on(UIEvents.deviceDiscovered, this.deviceDiscoveredEventHandler)
+    this.props.events.on(UIEvents.deviceDisappeared, this.deviceDisappearedEventHandler)
+    this.props.events.on(UIEvents.personUpdateNotification, this.personUpdateEventHandler)
+    this.props.events.on(UIEvents.deviceUpdateNotification, this.deviceUpdateEventHandler)
   }
+
+  unregisterEvents() {
+    this.props.events.removeListener(UIEvents.deviceDiscovered, this.deviceDiscoveredEventHandler)
+    this.props.events.removeListener(UIEvents.deviceDisappeared, this.deviceDisappearedEventHandler)
+    this.props.events.removeListener(UIEvents.personUpdateNotification, this.personUpdateEventHandler)
+    this.props.events.removeListener(UIEvents.deviceUpdateNotification, this.deviceUpdateEventHandler)
+  }
+
 
   refresh() {
     this.setState({ persons: this.persons, devices: this.devices })
@@ -79,7 +96,7 @@ class DeviceList extends React.Component {
   }
 
   renderPersonSelection(device) {
-    return (<select onChange={() => this.setOwnerForDevice(device)} defaultValue={device.owner ? device.owner.email : ''}>
+    return (<select onChange={event => this.setOwnerForDevice(device, event.target.value)} defaultValue={device.owner ? device.owner.email : ''}>
       <option value=""> - </option>
       {Object.keys(this.state.persons).map((key) => {
         const person = this.state.persons[key]

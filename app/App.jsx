@@ -7,8 +7,9 @@ const RouteHandler = require('react-router').RouteHandler
 const io = require('socket.io-client')
 const UIEvents = require('../Events/UIEvents')
 const notify = require('./Notify.jsx')
+const { url } = require('./Api')
 
-const events = io.connect(`${window.location.protocol}//${window.location.hostname}${window.location.port ? `:${window.location.port}` : ''}`)
+const events = io.connect(url)
 
 events.on(UIEvents.notifyPersonOnline, (person) => {
   notify(person.name, { image: person.gravatar, body: 'is now at the office' })

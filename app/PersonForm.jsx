@@ -1,16 +1,18 @@
 const React = require('react')
+const Person = require('../Models/Person')
 
 class PersonForm extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { email: '', name: '' }
+    this.state = { email: '', name: '', github: '' }
   }
 
   addPerson() {
-    if (this.state.email === '' || this.state.name === '') {
+    if (this.state.email === '' || this.state.name === '' || this.state.github === '') {
       alert('Enter valid values')
     } else {
-      this.props.onAddPerson(this.state.email, this.state.name)
+      const person = new Person(this.state)
+      this.props.onAddPerson(person)
     }
   }
 
@@ -24,7 +26,17 @@ class PersonForm extends React.Component {
             className="form-control"
             id="exampleInputEmail1"
             placeholder="Gravatar"
-            onChange={value => this.setState({ name: value })}
+            onKeyUp={event => this.setState({ email: event.target.value })}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="Github">Github</label>
+          <input
+            type="text"
+            className="form-control"
+            id="github"
+            placeholder="Github"
+            onKeyUp={event => this.setState({ github: event.target.value })}
           />
         </div>
         <div className="form-group">
@@ -34,15 +46,15 @@ class PersonForm extends React.Component {
             className="form-control"
             id="name"
             placeholder="Name"
-            onChange={value => this.setState({ name: value })}
+            onKeyUp={event => this.setState({ name: event.target.value })}
           />
         </div>
         <button
-          onClick={this.props.onAbort}
+          onClick={() => this.props.onAbort()}
           className="btn btn-danger btn-sm"
         >Abort</button>&nbsp;
         <button
-          onClick={this.addPerson}
+          onClick={() => this.addPerson()}
           type="submit"
           className="btn btn-primary btn-sm"
         >Add</button>

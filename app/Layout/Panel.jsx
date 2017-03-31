@@ -22,7 +22,7 @@ class Panel extends React.Component {
 
 Panel.propTypes = {
   title: React.PropTypes.node.isRequired,
-  controls: React.PropTypes.node.isOptional,
+  controls: React.PropTypes.func.isOptional,
   children: React.PropTypes.node.isRequired,
 }
 

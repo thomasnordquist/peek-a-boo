@@ -12,5 +12,4 @@ module.exports = {
   setOwnerOfDevice: 'setOwnerOfDevice',
   notifyPersonOffline: 'userOffline',
   notifyPersonOnline: 'userOnline',
-
 }

@@ -16,14 +16,14 @@ class PersonLine extends React.Component {
     const person = this.props.person
 
     return (
-      <tr className="person">
-        <td><img alt={person.name} src={person.gravatar} className="gravatar" /></td>
+      <tr className="person" key={person.email}>
+        <td><img alt={person.name} src={person.getAvatar()} className="gravatar" /></td>
         <td className={PersonLine.isOffline.call(this, person) ? 'statusOffline' : 'statusOnline'}>{ person.name }</td>
         <td className="lastSeen">{ person.lastSeen() ? moment().to(person.lastSeen()) : 'never' }</td>
         <td className="status">
           { PersonLine.isOffline.call(this, person)
-            ? <span className="offline">offline</span>
-            : <span className="online">online</span>
+            ? <label className="offline">offline</label>
+            : <label className="online">online</label>
           }
         </td>
       </tr>
