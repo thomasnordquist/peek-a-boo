@@ -46,8 +46,7 @@
     "socket.io": "^1.7.3",
     "socket.io-client": "^1.7.3",
     "url-loader": "^0.5.8",
-    "webpack": "^2.3.2",
-    "webpack-dev-server": "^2.4.2",
+    "webpack": "^2.3.3",
     "webpack-stats-plugin": "^0.1.4"
   }
 }
