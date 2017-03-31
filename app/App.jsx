@@ -1,6 +1,6 @@
 require('./Styles/style.less')
+require('./index.html')
 
-const html = require('./index.html')
 const React = require('react')
 const Navigation = require('./Layout/Navigation')
 const RouteHandler = require('react-router').RouteHandler
@@ -18,7 +18,7 @@ events.on(UIEvents.notifyPersonOffline, (person) => {
   notify(person.name, { image: person.gravatar, body: 'just left the office' })
 })
 
-const Application = new React.createClass({
+class Application extends React.Component {
   render() {
     return (
       <div>
@@ -28,6 +28,7 @@ const Application = new React.createClass({
         </div>
       </div>
     )
-  },
-})
+  }
+}
+
 module.exports = Application
