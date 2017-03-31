@@ -1,6 +1,6 @@
 const React = require('react')
 
-const Panel = React.createClass({
+class Panel extends React.Component {
   render() {
     return (
       <div className="panel panel-default">
@@ -9,7 +9,7 @@ const Panel = React.createClass({
             {this.props.title}
           </span>
           <span className="controls">
-            {this.props.controls ? this.props.controls : null}
+            {this.props.controls}
           </span>
         </div>
         <div className="panel-body">
@@ -17,7 +17,17 @@ const Panel = React.createClass({
         </div>
       </div>
     )
-  },
-})
-module.exports = Panel
+  }
+}
 
+Panel.propTypes = {
+  title: React.PropTypes.node.isRequired,
+  controls: React.PropTypes.node.isOptional,
+  children: React.PropTypes.node.isRequired,
+}
+
+Panel.defaultProps = {
+  controls: null,
+}
+
+module.exports = Panel
