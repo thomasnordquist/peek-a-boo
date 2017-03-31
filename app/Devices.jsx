@@ -1,97 +1,106 @@
 const React = require('react')
 const Panel = require('./Layout/Panel')
-const io = require('socket.io-client')
+const Person = require('../Models/Person')
+const Device = require('../Models/Device')
 const UIEvents = require('../Events/UIEvents')
 require('array.prototype.find')
 
-const DeviceList = React.createClass({
-  devices: {},
-  persons: {},
-  getInitialState() {
+class DeviceList extends React.Component {
+  constructor(props) {
+    super(props)
+    this.devices = {}
+    this.persons = {}
+
+    this.state = { devices: this.devices, persons: this.persons }
+  }
+
+  componentWillMount() {
     this.registerEvents()
 
-    return { devices: this.devices, persons: this.persons }
-  },
-  registerEvents() {
-    this.props.events.on(UIEvents.deviceDiscovered, this.addDevice)
-    this.props.events.on(UIEvents.deviceDisappeared, this.removeDevice)
-    this.props.events.on(UIEvents.personUpdateNotification, this.updatePerson)
-    this.props.events.on(UIEvents.deviceUpdateNotification, this.updateDevice)
-    this.props.events.on(UIEvents.persons, this.setPersons)
-    this.props.events.on(UIEvents.devices, this.setDevices)
-  },
+    this.props.events.emit(UIEvents.getPersons)
+    this.props.events.emit(UIEvents.getDevices)
+  }
+
+  setOwnerForDevice(device, event) {
+    const email = event.target.value
+    this.props.events.emit(UIEvents.setOwnerOfDevice, email, device.mac)
+  }
+
+  setDevices(devices) {
+    devices.forEach((device) => {
+      this.devices[device.mac] = new Device(device)
+    })
+    this.refresh()
+  }
+
+  setPersons(persons) {
+    persons.forEach((person) => {
+      this.persons[person.email] = new Person(person)
+    })
+    this.refresh()
+  }
+
   updatePerson(person) {
     console.log('UpdatePerson: ', person)
     this.persons[person.email] = person
     this.refresh()
-  },
+  }
+
   updateDevice(device) {
     console.log('UpdateDevice: ', device)
     this.devices[device.mac] = device
     this.refresh()
-  },
-  componentWillMount() {
-    this.props.events.emit(UIEvents.getPersons)
-    this.props.events.emit(UIEvents.getDevices)
-  },
-  setPersons(persons) {
-    persons.forEach((person) => {
-      this.persons[person.email] = person
-    })
-    this.refresh()
-  },
+  }
+
+  registerEvents() {
+    this.props.events.on(UIEvents.deviceDiscovered, res => this.addDevice(res))
+    this.props.events.on(UIEvents.deviceDisappeared, res => this.removeDevice(res))
+    this.props.events.on(UIEvents.personUpdateNotification, res => this.updatePerson(res))
+    this.props.events.on(UIEvents.deviceUpdateNotification, res => this.updateDevice(res))
+    this.props.events.on(UIEvents.persons, res => this.setPersons(res))
+    this.props.events.on(UIEvents.devices, res => this.setDevices(res))
+  }
+
   refresh() {
-    if (this.isMounted()) {
-      this.setState({ persons: this.persons, devices: this.devices })
-    }
-  },
-  setDevices(devices) {
-    devices.forEach((device) => {
-      this.devices[device.mac] = device
-    })
-    this.refresh()
-  },
+    this.setState({ persons: this.persons, devices: this.devices })
+  }
+
   removeDevice(device) {
     if (this.devices[device.mac]) {
       delete this.devices[device.mac]
     }
 
-    if (this.isMounted()) {
-      this.setState({ devices: this.devices })
-    }
-  },
+    this.setState({ devices: this.devices })
+  }
+
   addDevice(device) {
     this.devices[device.mac] = device
+    this.setState({ devices: this.devices })
+  }
 
-    if (this.isMounted()) {
-      this.setState({ devices: this.devices })
-    }
-  },
-  setOwnerForDevice(device, event) {
-    const email = event.target.value
-    this.props.events.emit(UIEvents.setOwnerOfDevice, email, device.mac)
-  },
+  renderPersonSelection(device) {
+    return (<select onChange={() => this.setOwnerForDevice(device)} defaultValue={device.owner ? device.owner.email : ''}>
+      <option value=""> - </option>
+      {Object.keys(this.state.persons).map((key) => {
+        const person = this.state.persons[key]
+        return <option key={person.email} value={person.email}> {person.name}</option>
+      })}
+    </select>)
+  }
+
+  renderDevice(device) {
+    return (<tr key={device.mac}>
+      <td className="hostColumn">{ device.hostname }</td>
+      <td className="macColumn">{ device.mac }</td>
+      <td>{this.renderPersonSelection(device)}</td>
+    </tr>)
+  }
+
+  renderDevices() {
+    return Object.values(this.state.devices).map(device => this.renderDevice(device))
+  }
+
   render() {
-    function isPersonOwner(person, device) {
-      return (device.owner && person.email == device.owner.email)
-    }
-    function selectOwner(device) {
-      return (<select onChange={this.setOwnerForDevice.bind(this, device)} defaultValue={device.owner ? device.owner.email : ''}>
-        <option value=""> - </option>
-        {Object.keys(this.state.persons).map((key) => {
-          const person = this.state.persons[key]
-          return <option key={person.email} value={person.email}> {person.name}</option>
-        })}
-      </select>)
-    }
-    const renderDevices = function (key) {
-      const device = this.state.devices[key]
-      return (<tr key={device.mac}>
-        <td className="hostColumn">{ device.host }</td>
-        <td className="macColumn">{ device.mac }</td>
-        <td>{selectOwner.call(this, device)}</td>
-      </tr>)
-    }
     return (
       <Panel title="Devices">
         <table className="table table-striped">
@@ -103,11 +112,16 @@ const DeviceList = React.createClass({
             </tr>
           </thead>
           <tbody>
-            { Object.keys(this.state.devices).map(renderDevices.bind(this)) }
+            { this.renderDevices() }
           </tbody>
         </table>
       </Panel>
     )
-  },
-})
+  }
+}
+
+DeviceList.propTypes = {
+  events: React.PropTypes.object.isRequired,
+}
+
 module.exports = DeviceList
