@@ -52,7 +52,7 @@ class PersonTable extends React.Component {
         </tr>
       </thead>
       <tbody>
-        { sortedPersonKeys.map(this.renderPerson) }
+        { sortedPersonKeys.map(person => this.renderPerson(person)) }
       </tbody>
 
     </table>)
