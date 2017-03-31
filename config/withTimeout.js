@@ -1,11 +1,11 @@
-module.exports = function(fn, timeout, callback) {
-	var timedOut = false;
-	var to = setTimeout(function() {
-		timedOut = true;
-		callback();
-	}, timeout);
-	fn(function() {
-		clearTimeout(to);
-		if(!timedOut) callback();
-	});
-};
+module.exports = function (fn, timeout, callback) {
+  let timedOut = false
+  const to = setTimeout(() => {
+    timedOut = true
+    callback()
+  }, timeout)
+  fn(() => {
+    clearTimeout(to)
+    if (!timedOut) callback()
+  })
+}

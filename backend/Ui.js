@@ -1,9 +1,9 @@
-var inheritance = require('util');
-var EventEmitter = require('events').EventEmitter;
-var Server = require('./Server');
-var UIEvents = require('../Events/UIEvents');
+const inheritance = require('util')
+const EventEmitter = require('events').EventEmitter
+const Server = require('./Server')
+const UIEvents = require('../Events/UIEvents')
 
-require('array.prototype.find');
+require('array.prototype.find')
 
 /**
  * The Emitter couples events from a socket to the events of the backend
@@ -13,183 +13,173 @@ require('array.prototype.find');
  * @param prependEmitter when true, the first argument of the function will be the emitter itself
  * @constructor
  */
-var UIEmitter = function(target, source, uiEvent, prependEmitter) {
-    this.event = uiEvent;
+const UIEmitter = function (target, source, uiEvent, prependEmitter) {
+  this.event = uiEvent
 
-    var emit = function() {
-        var args = Array.prototype.slice.call(arguments);
+  const emit = function () {
+    const args = Array.prototype.slice.call(arguments)
 
-        if('undefined' !== typeof(prependEmitter) && prependEmitter == true) {
-            args.unshift(target);
-        }
+    if (typeof (prependEmitter) !== 'undefined' && prependEmitter == true) {
+      args.unshift(target)
+    }
 
-        args.unshift(uiEvent);
-        target.emit.apply(target, args);
-    };
+    args.unshift(uiEvent)
+    target.emit(...args)
+  }
 
-    this.remove = function() {
-        source.removeListener(uiEvent, emit);
-    };
+  this.remove = function () {
+    source.removeListener(uiEvent, emit)
+  }
 
-    source.on(uiEvent, emit);
-};
+  source.on(uiEvent, emit)
+}
 
-var UI = function(socket) {
-    EventEmitter.call(this);
+const UI = function (socket) {
+  EventEmitter.call(this)
 
-    var listeners = [];
-    var actors = [];
-    var uiSocket = socket;
+  const listeners = []
+  const actors = []
+  const uiSocket = socket
 
     /**
      * Creates an actor which emits events from the socket whith this object
      */
-    this.actOn = function(uiEvent) {
-        actors.push(new UIEmitter(this, socket, uiEvent, true))
-    };
+  this.actOn = function (uiEvent) {
+    actors.push(new UIEmitter(this, socket, uiEvent, true))
+  }
 
-    this.listenTo = function(uiEvent) {
-        if(typeof(this.findListener(uiEvent)) === 'undefined') {
-            listeners.push(new UIEmitter(socket, this, uiEvent))
-        } else {
-            
-        }
-    };
+  this.listenTo = function (uiEvent) {
+    if (typeof (this.findListener(uiEvent)) === 'undefined') {
+      listeners.push(new UIEmitter(socket, this, uiEvent))
+    } else {
 
-    this.findListener = function(event) {
-        return listeners.find(function(item) {
-            return (item.event == event);
-        });
-    };
+    }
+  }
 
-    this.removeEvent = function(event){
-        var listener = listeners.find(function(item) {
-            return (item.event == event);
-        });
+  this.findListener = function (event) {
+    return listeners.find(item => (item.event == event))
+  }
 
-        if(typeof(listener) !== 'undefined') {
-            
-            listener.remove();
-            listeners.splice(listeners.indexOf(listener));
-        }
-    };
+  this.removeEvent = function (event) {
+    const listener = listeners.find(item => (item.event == event))
 
-    this.addInvocation = function(invocation){
-        this.on(invocation.event, invocation.func)
-    };
-};
+    if (typeof (listener) !== 'undefined') {
+      listener.remove()
+      listeners.splice(listeners.indexOf(listener))
+    }
+  }
 
-var SocketUI = function ( collection, app ) {
-    var self = this;
-    this.clients = [];
-    this.socket = require('socket.io')(app);
+  this.addInvocation = function (invocation) {
+    this.on(invocation.event, invocation.func)
+  }
+}
 
-    this.socket.on('connection', function (socket) {
-        var ui = new UI(socket);
+const SocketUI = function (collection, app) {
+  const self = this
+  this.clients = []
+  this.socket = require('socket.io')(app)
 
-        self.clients.push(ui);
-        collection.register(ui);
+  this.socket.on('connection', (socket) => {
+    const ui = new UI(socket)
 
-        socket.on('disconnect', self.disconnect);
-    });
+    self.clients.push(ui)
+    collection.register(ui)
 
-    this.socket.on('error', function () {
-        
-    });
+    socket.on('disconnect', self.disconnect)
+  })
 
-    this.disconnect = function (socket) {
-        
-    };
-};
+  this.socket.on('error', () => {
 
-var UICollection = function () {
-    var interfaces = [];
-    var invokeStore = [];
+  })
 
-    this.register = function (ui) {
-        
+  this.disconnect = function (socket) {
 
-        interfaces.push(ui);
-        this.registerEvents(ui);
-    };
+  }
+}
 
-    this.findInterfaces = function(ui){
-        if(!Array.isArray(ui)) {
-            ui = [ ui ];
-        }
+const UICollection = function () {
+  const interfaces = []
+  const invokeStore = []
 
-        return ui.filter(function(item) {
-            return interfaces.indexOf(item) != -1;
-        });
-    };
+  this.register = function (ui) {
+    interfaces.push(ui)
+    this.registerEvents(ui)
+  }
 
-    this.emit = function(event, target, data) {
-        var targetInterfaces = this.findInterfaces(target);
-        if('undefined' !== typeof(targetInterfaces)) {
-            targetInterfaces.forEach(function(ui){
-                ui.emit(event, data);
-            })
-        } else {
+  this.findInterfaces = function (ui) {
+    if (!Array.isArray(ui)) {
+      ui = [ui]
+    }
+
+    return ui.filter(item => interfaces.indexOf(item) != -1)
+  }
+
+  this.emit = function (event, target, data) {
+    const targetInterfaces = this.findInterfaces(target)
+    if (typeof (targetInterfaces) !== 'undefined') {
+      targetInterfaces.forEach((ui) => {
+        ui.emit(event, data)
+      })
+    } else {
             /* todo: implement logging */
-        }
-    };
+    }
+  }
 
-    this.all = function() {
-        return interfaces.slice(0);
-    };
+  this.all = function () {
+    return interfaces.slice(0)
+  }
 
-    this.on = function(event, func){
-        var invocation = {event:event, func:func};
-        invokeStore.push(invocation);
+  this.on = function (event, func) {
+    const invocation = { event, func }
+    invokeStore.push(invocation)
 
-        interfaces.forEach(function(ui) {
-            ui.addInvocation(invocation);
-        });
-    };
+    interfaces.forEach((ui) => {
+      ui.addInvocation(invocation)
+    })
+  }
 
-    this.registerEvents = function (ui) {
-        invokeStore.forEach(function(invocation) {
-            ui.addInvocation(invocation);
-        });
+  this.registerEvents = function (ui) {
+    invokeStore.forEach((invocation) => {
+      ui.addInvocation(invocation)
+    })
 
-        ui.listenTo(UIEvents.deviceDiscovered);
-        ui.listenTo(UIEvents.deviceDisappeared);
-        ui.listenTo(UIEvents.personUpdateNotification);
-        ui.listenTo(UIEvents.deviceUpdateNotification);
-        ui.listenTo(UIEvents.addPersonNotification);
-        ui.listenTo(UIEvents.persons);
-        ui.listenTo(UIEvents.devices);
-        ui.listenTo(UIEvents.notifyPersonOnline);
-        ui.listenTo(UIEvents.notifyPersonOffline);
+    ui.listenTo(UIEvents.deviceDiscovered)
+    ui.listenTo(UIEvents.deviceDisappeared)
+    ui.listenTo(UIEvents.personUpdateNotification)
+    ui.listenTo(UIEvents.deviceUpdateNotification)
+    ui.listenTo(UIEvents.addPersonNotification)
+    ui.listenTo(UIEvents.persons)
+    ui.listenTo(UIEvents.devices)
+    ui.listenTo(UIEvents.notifyPersonOnline)
+    ui.listenTo(UIEvents.notifyPersonOffline)
 
-        ui.actOn(UIEvents.createPerson);
-        ui.actOn(UIEvents.getPersons);
-        ui.actOn(UIEvents.getDevices);
-        ui.actOn(UIEvents.setOwnerOfDevice);
-
-    };
+    ui.actOn(UIEvents.createPerson)
+    ui.actOn(UIEvents.getPersons)
+    ui.actOn(UIEvents.getDevices)
+    ui.actOn(UIEvents.setOwnerOfDevice)
+  }
 
     /**
      * Used to remove all non-printable information
      */
-    function filterValues(obj) {
-        if (typeof obj.printableValues !== 'undefined') {
-            obj = obj.printableValues();
-        }
-        return obj;
-    };
-};
-
-inheritance.inherits(UI, EventEmitter);
-
-function UserInterface(options) {
-    var server = new Server(options);
-
-    var collection = new UICollection();
-    new SocketUI(collection, server.server);
-    return collection;
+  function filterValues(obj) {
+    if (typeof obj.printableValues !== 'undefined') {
+      obj = obj.printableValues()
+    }
+    return obj
+  }
 }
 
-UserInterface.UIEmitter = UIEmitter;
+inheritance.inherits(UI, EventEmitter)
 
-module.exports = UserInterface;
+function UserInterface(options) {
+  const server = new Server(options)
+
+  const collection = new UICollection()
+  new SocketUI(collection, server.server)
+  return collection
+}
+
+UserInterface.UIEmitter = UIEmitter
+
+module.exports = UserInterface
