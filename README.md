@@ -10,5 +10,10 @@ The Application consists of two parts:
 ### Build production assets
 `npm run build`
 
-#### Start the service
+### Run Application 
+
+#### Start application as service (with forever)
 `npm run service`
+
+#### Start application
+`npm run app`
