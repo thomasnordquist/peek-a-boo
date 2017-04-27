@@ -1,46 +1,45 @@
 const React = require('react')
+const { Component, PropTypes } = require('react')
 const TableRow = require('./TableRow')
 const Person = require('../../Models/Person')
+const moment = require('moment')
 
-class PersonTable extends React.Component {
-  static sortPersonsByStatus(persons, keys) {
-    return keys.sort((keyA, keyB) => {
-      const a = persons[keyA]
-      const b = persons[keyB]
+class PersonTable extends Component {
+  static sortPersonsByStatus(a, b) {
+    function valueForPersion(p) {
+      if (p.devices.length === 0) { return -5 } // should be on the bottom
+      return p.isOnline() ? 1 : 0
+    }
 
-      if (!a.lastSeen()) {
-        return 1
-      } else if (!b.lastSeen()) {
-        return -1
-      }
-      return Math.round((b.lastSeen() - a.lastSeen()) / 1000 / 60)
-    })
+    const aOnline = valueForPersion(a)
+    const bOnline = valueForPersion(b)
+    return bOnline - aOnline
+
+    /* const timeA = Math.round(moment(a.lastSeen()).format('x') / 60) // Minutes since 1970
+    const timeB = Math.round(moment(b.lastSeen()).format('x') / 60) // Minutes since 1970
+    return timeB - timeA*/
   }
 
-  static sortPersonsByName(persons, keys) {
-    return keys.sort((keyA, keyB) => {
-      const a = persons[keyA]
-      const b = persons[keyB]
-
-      if (a.name < b.name) { return -1 }
-      if (a.name > b.name) { return 1 }
-      return 0
-    })
+  static sortPersonsByName(a, b) {
+    return (a.name > b.name) ? 1 : -1
   }
 
-  renderPerson(key) {
-    const person = this.props.persons[key]
+  renderPerson(person) {
     return <TableRow key={person.email} person={person} />
   }
 
   render() {
     /* sort lastSeen desc, name asc */
-    let sortedPersonKeys = PersonTable.sortPersonsByName(
+    /* let sortedPersonKeys = PersonTable.sortPersonsByName(
       this.props.persons,
       Object.keys(this.props.persons),
-    )
+    )*/
 
-    sortedPersonKeys = PersonTable.sortPersonsByStatus(this.props.persons, sortedPersonKeys)
+    // sortedPersonKeys = PersonTable.sortPersonsByStatus(this.props.persons, sortedPersonKeys)
+
+    const persons = Object.values(this.props.persons)
+    const a = persons.sort(PersonTable.sortPersonsByName)
+    const b = a.sort(PersonTable.sortPersonsByStatus)
 
     return (<table className="table table-striped persons">
       <thead>
@@ -52,7 +51,7 @@ class PersonTable extends React.Component {
         </tr>
       </thead>
       <tbody>
-        { sortedPersonKeys.map(person => this.renderPerson(person)) }
+        { b.map(person => this.renderPerson(person)) }
       </tbody>
 
     </table>)
@@ -60,6 +59,6 @@ class PersonTable extends React.Component {
 }
 
 PersonTable.propTypes = {
-  persons: React.PropTypes.arrayOf(React.PropTypes.instanceOf(Person)).isRequired,
+  persons: PropTypes.arrayOf(PropTypes.instanceOf(Person)).isRequired,
 }
 module.exports = PersonTable

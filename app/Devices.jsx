@@ -1,4 +1,5 @@
 const React = require('react')
+const { Component, PropTypes } = require('react')
 const Panel = require('./Layout/Panel')
 const Person = require('../Models/Person')
 const Device = require('../Models/Device')
@@ -7,7 +8,7 @@ const Api = require('./Api')
 
 require('array.prototype.find')
 
-class DeviceList extends React.Component {
+class DeviceList extends Component {
   constructor(props) {
     super(props)
     this.devices = {}
@@ -109,6 +110,7 @@ class DeviceList extends React.Component {
     return (<tr key={device.mac}>
       <td className="hostColumn">{ device.hostname }</td>
       <td className="macColumn">{ device.mac }</td>
+      <td className="vendorColumn">{ device.vendor }</td>
       <td>{this.renderPersonSelection(device)}</td>
     </tr>)
   }
@@ -125,6 +127,7 @@ class DeviceList extends React.Component {
             <tr>
               <th className="hostColumn">Host</th>
               <th className="macColumn">MAC</th>
+              <th className="macColumn">Vendor</th>
               <th>Owner</th>
             </tr>
           </thead>
@@ -138,7 +141,7 @@ class DeviceList extends React.Component {
 }
 
 DeviceList.propTypes = {
-  events: React.PropTypes.object.isRequired,
+  events: PropTypes.object.isRequired,
 }
 
 module.exports = DeviceList

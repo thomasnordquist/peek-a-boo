@@ -1,7 +1,9 @@
 const React = require('react')
+const { Component, PropTypes } = require('react')
+
 const Person = require('../Models/Person')
 
-class PersonForm extends React.Component {
+class PersonForm extends Component {
   constructor(props) {
     super(props)
     this.state = { email: '', name: '', github: '' }
@@ -64,7 +66,7 @@ class PersonForm extends React.Component {
 }
 
 PersonForm.propTypes = {
-  onAddPerson: React.PropTypes.func.isRequired,
+  onAddPerson: PropTypes.func.isRequired,
 }
 
 module.exports = PersonForm

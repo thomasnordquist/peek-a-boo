@@ -10,7 +10,7 @@ const Route = Router.Route
 const DefaultRoute = Router.DefaultRoute
 
 // polyfill
-if (!Object.assign) { Object.assign = React.__spread }
+// if (!Object.assign) { Object.assign = React.__spread }
 
 const routes = (
   <Route name="app" handler={App} path="/">

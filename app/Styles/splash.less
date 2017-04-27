@@ -1,0 +1,40 @@
+#splash .logo {
+  height: 1em;
+  width: 1em;
+  display: inline-block;
+  background-image: url('./statics/see-no-evil-big.png');
+  background-size:cover;
+}
+
+#splash.loaded .logo {
+  background-image: url('./statics/hear-no-evil-big.png');
+}
+
+#splash .div {
+  text-align: center;
+}
+
+#splash {
+  margin: 0; padding: 0;
+  background-color: #3E3F3A;
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2000000;
+  opacity:1;
+  position:fixed;
+  left: 0;
+  top:0;
+  transition: opacity 0.75s ease-out;
+  font-size: 10vw;
+  font-family: sans-serif !important;
+  text-align: center;
+  text-size-adjust: 100%;
+  line-height: 1.4;
+  padding-top: 20vh;
+  color: #DFD7CA;
+}
+
+#splash.loaded {
+ opacity:0.0
+}

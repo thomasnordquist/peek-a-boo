@@ -1,6 +1,7 @@
 const React = require('react')
+const { Component } = require('react')
 
-class Panel extends React.Component {
+class Panel extends Component {
   render() {
     return (
       <div className="panel panel-default">

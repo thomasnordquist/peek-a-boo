@@ -1,7 +1,7 @@
 const config = require('../config')
 const axios = require('axios')
 
-const apiUrl = `${window.location.protocol}//${window.location.hostname}${window.location.port ? `:${config.applicationPort}` : ''}`
+const apiUrl = `${window.location.protocol}//${window.location.hostname}:${config.applicationPort ? config.applicationPort : window.location.port}`
 
 class Api {
   static getPersons() {

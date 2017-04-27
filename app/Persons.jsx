@@ -1,5 +1,7 @@
-const Person = require('../Models/Person')
 const React = require('react')
+const { Component, PropTypes } = require('react')
+
+const Person = require('../Models/Person')
 const Panel = require('./Layout/Panel')
 const PersonForm = require('./PersonForm')
 const UIEvents = require('../Events/UIEvents')
@@ -7,7 +9,7 @@ const NotificationSettings = require('./NotificationSettings')
 const PersonTable = require('./PersonTable/Table')
 const Api = require('./Api')
 
-class Persons extends React.Component {
+class Persons extends Component {
   constructor(props) {
     super(props)
     this.persons = {}
@@ -96,6 +98,6 @@ class Persons extends React.Component {
 }
 
 Persons.propTypes = {
-  events: React.PropTypes.object.isRequired,
+  events: PropTypes.object.isRequired,
 }
 module.exports = Persons

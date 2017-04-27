@@ -1,3 +1,4 @@
+const config = require('../config')
 const moment = require('moment')
 const axios = require('axios')
 const gravatarLoader = require('gravatar')
@@ -19,7 +20,7 @@ module.exports = class Person {
   getGithubAvatar() {
     return axios.get(`https://api.github.com/users/${this.github}`)
       .then(response => response.data.avatar_url)
-      .catch(() => console.log('could not load github avatar for', this))
+      .catch(err => console.log('could not load github avatar for', this, err))
   }
 
   async updateAvatars() {
@@ -29,6 +30,14 @@ module.exports = class Person {
 
     this.gravatar = gravatarLoader.url(this.email, { s: '256', r: 'x', d: 'mm' })
     this.githubAvatar = await this.getGithubAvatar()
+  }
+
+  isOnline() {
+    return moment(this.lastSeen()) > moment().subtract(config.offlineAfter, 'seconds')
+  }
+
+  isOffline() {
+    return !this.isOnline()
   }
 
   lastSeen() {

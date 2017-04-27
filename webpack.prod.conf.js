@@ -1,6 +1,8 @@
 const webpack = require('webpack')
+const BabiliPlugin = require('babili-webpack-plugin')
 const path = require('path')
 const StatsWriterPlugin = require('webpack-stats-plugin').StatsWriterPlugin
+const LessPluginCleanCSS = require('less-plugin-clean-css')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 module.exports = {
@@ -8,16 +10,6 @@ module.exports = {
   devtool: 'cheap-module-source-map',
   entry: {
     app: [
-      'react-hot-loader/patch',
-      // activate HMR for React
-
-      'webpack-dev-server/client?http://localhost:3000',
-      // bundle the client for webpack-dev-server
-      // and connect to the provided endpoint
-
-      'webpack/hot/only-dev-server',
-      // bundle the client for hot reloading
-      // only- means to only hot reload for successful updates
       './Router?main',
     ],
     splash: [
@@ -63,29 +55,16 @@ module.exports = {
       $: 'jquery',
       jQuery: 'jquery',
     }),
-
-    new webpack.HotModuleReplacementPlugin(),
-    // enable HMR globally
-
-    new webpack.NamedModulesPlugin(),
-    // prints more readable module names in the browser console on HMR updates
-
-    new webpack.NoEmitOnErrorsPlugin(),
-
-    // do not emit compiled assets that include errors
-    new ExtractTextPlugin('[name].css'),
-
+    new BabiliPlugin(),
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: JSON.stringify('production'),
+      },
+    }),
     new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en/), // Remove other locaes to save space
-
+    new ExtractTextPlugin('[name].css'),
+    new StatsWriterPlugin({
+      filename: 'stats.json', // Default
+    }),
   ],
-  devServer: {
-    host: 'localhost',
-    port: 3000,
-
-    historyApiFallback: true,
-  // respond to 404s with index.html
-
-    hot: true,
-  // enable HMR on the server
-  },
 }

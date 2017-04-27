@@ -1,9 +1,10 @@
 const React = require('react')
+const { Component } = require('react')
 const Link = require('react-router').Link
 
 require('bootstrap/js/collapse')
 
-class Application extends React.Component {
+class Application extends Component {
   render() {
     return (
       <nav className="navbar navbar-default">
@@ -22,7 +23,8 @@ class Application extends React.Component {
               <span className="icon-bar" />
               <span className="icon-bar" />
             </button>
-            <a className="logo navbar-brand">Peek-A-Boo</a>
+            <a className="logo" />
+            <a className="navbar-brand">Peek-A-Boo</a>
           </div>
           <div id="navbar" className="navbar-collapse collapse" ref="collapse">
             <ul className="nav-items nav navbar-nav" id="navbar">

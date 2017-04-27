@@ -2,34 +2,16 @@ const Datastore = require('nedb')
 const config = require('../config')
 const Server = require('./Server')
 const Person = require('../Models/Person')
-const axios = require('axios')
+const Device = require('../Models/Device')
 
 const { app, server } = new Server({ port: config.applicationPort, serverMode: 'dev' })
 const UI = require('./Ui')(server)
 const UIEvents = require('../Events/UIEvents')
 
 const db = {}
-db.hosts = []
 db.persons = {}
+db.devices = []
 db.people = new Datastore({ filename: './stores/people.db', autoload: true })
-
-function loadPersons() {
-  return new Promise((resolve) => {
-    db.people.find({}, (err, persons) => {
-      persons
-        .map(person => new Person(person))
-        .forEach((person) => {
-          // Merge current devices into new persons
-          if (db.persons[person.email]) {
-            person.devices = db.persons[person.email].devices
-          }
-          // Refresh person
-          db.persons[person.email] = person
-        })
-      resolve(Object.values(db.persons))
-    })
-  })
-}
 /* Set Autocompaction Interval to 5m */
 db.people.persistence.setAutocompactionInterval(1000 * 60 * 5)
 
@@ -45,9 +27,13 @@ function onDeviceUpdate(person) {
   UI.emit(UIEvents.deviceUpdateNotification, UI.all(), person)
 }
 
-/* function onPersonDisappearance(host) {
-  UI.emit(UIEvents.personDisappeared, UI.all(), host)
-}*/
+function onPersonDisappearance(person) {
+  UI.emit(UIEvents.notifyPersonOffline, UI.all(), person)
+}
+
+function onPersonAppearance(person) {
+  UI.emit(UIEvents.notifyPersonOnline, UI.all(), person)
+}
 
 function onPersonUpdate(person) {
   db.persons[person.email] = person
@@ -67,21 +53,7 @@ function createPerson(person) {
   })
 }
 
-function getPersons(target) {
-  loadPersons()
-    .then((persons) => {
-      UI.emit(UIEvents.persons, target, persons)
-    })
-}
-
-function getDevices(target) {
-  UI.emit(UIEvents.devices, target, db.devices)
-}
-
 function setOwnerOfDevice(target, email, mac) {
-  if (!email || email === '') {
-    return
-  }
   function setNewOwner(email, mac) {
     db.people.findOne({ email }, (err, person) => {
       if (person != null) {
@@ -144,18 +116,34 @@ async function personsForDeviceList(devices) {
   return Object.values(personGroup)
 }
 
-const previousDevices = []
+let previousPersons = []
 app.post('/api/devices', async (req, res) => {
   res.send({})
   const devices = req.body
+
+  // hack for hostnames
+  devices.forEach((d) => {
+    const hostname = d.hostnames ? d.hostnames[0] : ''
+    d.hostname = hostname
+  })
+
   db.devices = devices
 
   const onlinePersons = await personsForDeviceList(devices)
   onlinePersons.forEach(person => onPersonUpdate(person))
 
-  console.log('online', onlinePersons)
-  const newDevices = devices.filter(d => !previousDevices.find(pd => pd.mac === d.mac))
-  const removedDevices = previousDevices.filter(d => !devices.find(pd => pd.mac === d.mac))
+  const newPersons = onlinePersons.filter(p => !previousPersons.find(pp => pp.email === p.email))
+  const offlinePersons = previousPersons.filter(p => !onlinePersons.find(pp => pp.email === p.email))
+
+  newPersons.forEach(async (person) => {
+    onPersonAppearance(person)
+  })
+
+  offlinePersons.forEach(async (person) => {
+    onPersonDisappearance(person)
+  })
+
+  previousPersons = onlinePersons
 })
 
 app.get('/api/persons', async (req, res) => {
@@ -168,19 +156,57 @@ app.put('/api/person', (req, res) => {
   createPerson(person)
 })
 
-app.get('/api/devices', (req, res) => {
-  res.send(db.devices)
+app.get('/api/devices', async (req, res) => {
+  console.log(db.devices)
+  const devices = await Promise.all(db.devices.map(async (device) => {
+    const newDevice = new Device(device)
+    const person = await personForDevice(device)
+    newDevice.owner = person
+    return newDevice
+  }))
+  res.send(devices)
 })
 
-function cron() {
-  db.people.find({}, (err, persons) => {
-    persons.forEach(async (p) => {
-      const person = new Person(p)
-      await person.updateAvatars()
-      db.people.update({ email: person.email }, person)
+function findPersons(query) {
+  return new Promise((resolve, reject) => {
+    db.people.find(query, (err, persons) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(persons)
+      }
     })
   })
-  setTimeout(cron, 60 * 1000) // Hourly
+}
+
+async function updateRandomAvatar() {
+  const persons = await findPersons({})
+  const randomIndex = Math.floor(Math.random() * persons.length)
+  const person = new Person(persons[randomIndex])
+
+  await person.updateAvatars()
+  db.people.update({ email: person.email }, person)
+}
+
+function loadPersons() {
+  return new Promise(async (resolve) => {
+    const persons = await findPersons({})
+    persons.map(person => new Person(person))
+        .forEach((person) => {
+          // Merge current devices into new persons
+          if (db.persons[person.email]) {
+            person.devices = db.persons[person.email].devices
+          }
+          // Refresh person
+          db.persons[person.email] = person
+        })
+    resolve(Object.values(db.persons))
+  })
+}
+
+function cron() {
+  updateRandomAvatar()
+  setTimeout(cron, 5 * 60 * 1000) // Every 5 minutes
 }
 
 cron()

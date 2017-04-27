@@ -1,7 +1,8 @@
 const React = require('react')
+const { Component } = require('react')
 const notify = require('./Notify')
 
-class NotificationSettings extends React.Component {
+class NotificationSettings extends Component {
   static notificationsAvailable() {
     return ('Notification' in window)
   }
