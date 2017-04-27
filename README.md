@@ -11,6 +11,8 @@ The Application consists of two parts:
 `npm run build`
 
 ### Run Application 
+The service will run at port `8080`.
+It can be changed via config or environmental `PORT`.
 
 #### Start application as service (with forever)
 `npm run service`
