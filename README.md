@@ -1,7 +1,8 @@
 # Peek-A-Boo
 
-The Application consists of two parts, one discovering the network (Discovery `npm run discover`), the other part handles the received data and serves the application (`npm run app`).
-The separation allows the application to run on different machines in different networks (Apl)
+The Application consists of two parts:
+ - one discovering the network (https://github.com/thomasnordquist/peek-a-boo-discovery/)
+ - one displaying who is in the office
 
 ### Build development assets
 `npm run dev`
@@ -9,3 +10,5 @@ The separation allows the application to run on different machines in different 
 ### Build production assets
 `npm run build`
 
+#### Start the service
+`npm run service`
