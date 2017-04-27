@@ -2,6 +2,7 @@
   "name": "PeerLoad",
   "scripts": {
     "app": "node backend/main.js",
+    "service": "forever -f backend/main.js",
     "analyze": "webpack --config webpack.prod.conf.js --json > stats.json",
     "dev": "webpack-dev-server --config webpack.conf.js --progress --colors --port 2992 --inline",
     "build": "webpack --config webpack.prod.conf.js --progress --profile --colors",
@@ -35,6 +36,7 @@
     "extract-loader": "^0.1.0",
     "extract-text-webpack-plugin": "^2.1.0",
     "file-loader": "^0.8.4",
+    "forever": "^0.15.3",
     "gravatar": "^1.1.1",
     "jquery": "^3.2.1",
     "jsx-loader": "^0.13.2",
