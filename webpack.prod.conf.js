@@ -36,7 +36,24 @@ module.exports = {
           presets: ['es2015', 'react'],
         },
       },
-      { test: /\.png$/, loader: 'url-loader?limit=10000&mimetype=image/png' },
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        loaders: [
+          'file-loader?hash=sha512&digest=hex&name=[hash].[ext]',
+          {
+            loader: 'image-webpack-loader',
+            query: {
+              progressive: true,
+              optimizationLevel: 7,
+              interlaced: true,
+              pngquant: {
+                quality: '65-90',
+                speed: 4,
+              },
+            },
+          },
+        ],
+      },
       { test: /\.woff$/, loader: 'url-loader?limit=10000&mimetype=application/font-woff' },
       { test: /\.woff2$/, loader: 'url-loader?limit=10000&mimetype=application/font-woff' },
       { test: /\.ttf$/, loader: 'url-loader?limit=10000&mimetype=application/octet-stream' },
