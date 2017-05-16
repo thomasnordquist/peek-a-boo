@@ -183,9 +183,10 @@ function findPersons(query) {
 
 async function updateRandomAvatar() {
   const persons = await findPersons({})
+  if (persons.length === 0) return
+
   const randomIndex = Math.floor(Math.random() * persons.length)
   const person = new Person(persons[randomIndex])
-
   await person.updateAvatars()
   db.people.update({ email: person.email }, person)
 }
