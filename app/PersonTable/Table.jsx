@@ -24,7 +24,7 @@ class PersonTable extends Component {
     return (a.name > b.name) ? 1 : -1
   }
 
-  renderPerson(person) {
+  static renderPerson(person) {
     return <TableRow key={person.email} person={person} />
   }
 
