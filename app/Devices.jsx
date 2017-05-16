@@ -6,8 +6,6 @@ const Device = require('../Models/Device')
 const UIEvents = require('../Events/UIEvents')
 const Api = require('./Api')
 
-require('array.prototype.find')
-
 class DeviceList extends Component {
   constructor(props) {
     super(props)
