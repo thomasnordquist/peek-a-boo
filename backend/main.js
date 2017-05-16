@@ -1,3 +1,5 @@
+process.on('unhandledRejection', r => console.log(r))
+
 const Datastore = require('nedb')
 const config = require('../config')
 const Server = require('./Server')
