@@ -2,9 +2,11 @@
   "name": "PeerLoad",
   "scripts": {
     "app": "node backend/main.js",
+    "dev": "webpack-dashboard -- npm run dev-server",
     "service": "forever -f backend/main.js",
     "analyze": "webpack --config webpack.prod.conf.js --json > stats.json",
-    "dev": "webpack-dev-server --config webpack.conf.js --progress --colors --port 2992 --inline",
+    "dashboard": "webpack-dashboard",
+    "dev-server": "webpack-dev-server --config webpack.conf.js --progress --colors --port 2992 --inline",
     "build": "webpack --config webpack.prod.conf.js --progress --profile --colors",
     "drop-database": "rm stores/*.db"
   },
@@ -41,6 +43,7 @@
     "style-loader": "^0.12.2",
     "url-loader": "^0.5.8",
     "webpack": "^2.3.3",
+    "webpack-dashboard": "^0.4.0",
     "webpack-dev-server": "^2.4.2",
     "webpack-stats-plugin": "^0.1.4"
   },

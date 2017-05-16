@@ -65,6 +65,7 @@ module.exports = {
         loader: ExtractTextPlugin.extract({ fallback: 'style-loader', use: 'css-loader!less-loader' }),
       },
     ],
+
   },
   plugins: [
     new webpack.ProvidePlugin({

@@ -2,6 +2,7 @@ const webpack = require('webpack')
 const path = require('path')
 const StatsWriterPlugin = require('webpack-stats-plugin').StatsWriterPlugin
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const DashboardPlugin = require('webpack-dashboard/plugin')
 
 module.exports = {
   context: `${__dirname}/app`,
@@ -77,6 +78,7 @@ module.exports = {
 
     new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en/), // Remove other locaes to save space
 
+    new DashboardPlugin(),
   ],
   devServer: {
     host: 'localhost',
