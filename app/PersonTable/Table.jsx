@@ -51,7 +51,7 @@ class PersonTable extends Component {
         </tr>
       </thead>
       <tbody>
-        { b.map(person => this.renderPerson(person)) }
+        { b.map(person => PersonTable.renderPerson(person)) }
       </tbody>
 
     </table>)
