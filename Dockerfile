@@ -1,6 +1,6 @@
 FROM node:7
 
-ENV VERSION 0.0.2
+ENV VERSION 0.0.3
 
 RUN curl --silent --location https://github.com/thomasnordquist/peek-a-boo/archive/$VERSION.tar.gz | tar xzv \
  && mv /peek-a-boo-$VERSION /app
