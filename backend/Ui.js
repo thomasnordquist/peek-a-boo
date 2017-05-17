@@ -1,8 +1,6 @@
-const inheritance = require('util')
+nanconst inheritance = require('util')
 const EventEmitter = require('events').EventEmitter
 const UIEvents = require('../Events/UIEvents')
-
-require('array.prototype.find')
 
 /**
  * The Emitter couples events from a socket to the events of the backend
