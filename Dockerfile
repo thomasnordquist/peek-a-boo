@@ -13,7 +13,10 @@ RUN yarn install \
 	&& yarn install --production \
 	&& yarn cache clean
 
+
 # This is where people.db will be, it stores info on people and their associated devices
 VOLUME /app/stores
+
+EXPOSE 8080
 
 CMD yarn run service
