@@ -1,4 +1,4 @@
-nanconst inheritance = require('util')
+const inheritance = require('util')
 const EventEmitter = require('events').EventEmitter
 const UIEvents = require('../Events/UIEvents')
 
